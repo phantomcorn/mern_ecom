@@ -3,7 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './db/database.js'
 import authRoute from './routes/authRoute.js'
-import userRoute from './routes/userRoute.js'
+import productRoute from './routes/productRoute.js'
 import verifyJWT from './middleware/verifyJWT.js';
 
 //Deploy a server which acts as a backend
@@ -54,7 +54,7 @@ app.use("/api/auth", authRoute)
     Any request made to <BASE_URL>/api/user/ is directed to authRoute
     Handles getting user data
 */
-app.use("/api/user", verifyJWT, userRoute)
+app.use("/api/product", productRoute)
 
 
 // Any other request are rejected
