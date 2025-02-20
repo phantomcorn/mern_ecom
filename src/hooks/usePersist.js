@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 const usePersist = () => {
     //Whenever setPersist is called, we trigger useEffect and update our local storage
     //The next time we reload/refresh, we grab persist flag from our local storage 
-    const [persist, setPersist] = useState(JSON.parse(localStorage.getItem("persist")) || false)
+    const [persist, setPersist] = useState(JSON.parse(localStorage.getItem("persist")) || true)
 
     useEffect(() => {
         localStorage.setItem("persist", JSON.stringify(persist))
