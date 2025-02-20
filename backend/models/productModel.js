@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema({
     quantity: {type: Number, required: true},
 })
 
-//REST API on ThreadsDB.accounts
+//REST API on ThreadsDB.products
 const Product = mongoose.model("product", productSchema)
 
 export default Product;
