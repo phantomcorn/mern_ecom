@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './db/database.js'
-import authRoute from './routes/authRoute.js'
+import cartRoute from './routes/cartRoute.js'
 import productRoute from './routes/productRoute.js'
 import verifyJWT from './middleware/verifyJWT.js';
 
@@ -45,10 +45,10 @@ app.use(cookieParser())
 
 
 /*
-    Any request made to <BASE_URL>/api/auth/ is directed to authRoute
-    Handles account creation, authentication(login), verification(email), authorization(subsequent API calls)
+    Any request made to <BASE_URL>/api/cart/ is directed to authRoute
+    Handles creating sessions and carting products
 */
-app.use("/api/auth", authRoute)
+app.use("/api/cart", cartRoute)
 
 /*
     Any request made to <BASE_URL>/api/user/ is directed to authRoute
