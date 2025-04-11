@@ -5,7 +5,7 @@
     Any request to <BASE_URL>/api/product is further directed to the correct backend logic here
 */
 import express from "express"
-import { getAll } from "../controllers/productController.js";
+import { getAll, getById } from "../controllers/productController.js";
 const router = express.Router();
 
 /*
@@ -14,5 +14,6 @@ const router = express.Router();
     Retrieves user information
 */
 router.get("/", getAll)
+router.get("/:productId", getById)
 
 export default router

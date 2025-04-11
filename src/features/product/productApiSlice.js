@@ -6,7 +6,7 @@ export const productApiSlice = apiSlice.injectEndpoints({
             query: () => "/api/product",
         }),
         getProduct: builder.query({
-            query: payload => `/api/product?id=${payload.id}`
+            query: payload => `/api/product/${payload.id}`
         }),
         provideTags: ["Product"] // Result cached with the label User (Is retrieved again in cache only if subscribed)
         /*
@@ -18,5 +18,6 @@ export const productApiSlice = apiSlice.injectEndpoints({
 })
 
 export const {
-    useGetAllProductQuery
+    useGetAllProductQuery,
+    useGetProductQuery
 } = productApiSlice
