@@ -14,22 +14,25 @@ export default function Product() {
   const [addToCart, {isUninitialized, isLoading, isError, isSuccess}] = useAddToCartMutation()
   const productResp = useGetProductQuery({id}) /* Retrieves product information by Id*/
 
-  const handleClick = (e) => {
-    e.preventDefault()
-    try {
-      const resp = addToCart({id, quantity}).unwrap()
-      const products = resp.products
-      dispatch(setCart({products}))
-    } catch (err) {
-      console.log(err)
-    } 
-  }
+
 
   if (productResp.isSuccess) {
 
     const product = productResp.data
     const priceObj = product.prices[0]
+    const priceId = priceObj.id
     const price = getPrice(priceObj.currency,priceObj.unit_amount)
+
+    const handleClick = (e) => {
+      e.preventDefault()
+      try {
+        const resp = addToCart({id, priceId, quantity}).unwrap()
+        const products = resp.products
+        dispatch(setCart({products}))
+      } catch (err) {
+        console.log(err)
+      } 
+    }
 
     return (
       <div>
