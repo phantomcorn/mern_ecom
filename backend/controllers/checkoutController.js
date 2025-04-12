@@ -5,6 +5,7 @@ const stripe = useStripe(process.env.STRIPE_BACKEND_KEY)
 
 const YOUR_DOMAIN = process.env.VITE_APP_BASE_URL;
 
+// @route POST /api/checkout/create-checkout-session
 const createSession = asyncHandler(async (req,res) => {
     const session = await stripe.checkout.sessions.create({
         ui_mode: "embedded",
@@ -15,7 +16,7 @@ const createSession = asyncHandler(async (req,res) => {
                 quantity: 1,
             },
         ],
-        return_url: `${YOUR_DOMAIN}/return?session_id={CHECKOUT_SESSION_ID}`,
+        return_url: `${YOUR_DOMAIN}/return/{CHECKOUT_SESSION_ID}`,
         mode: 'payment',
     })
 
