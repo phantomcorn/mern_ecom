@@ -6,7 +6,7 @@ const getAll = asyncHandler(async (req, res) => {
 
     const products = await Product.find({}) //get all products
     //return result to frontend
-    res.status(200).send({
+    res.status(200).json({
         products
     })
 })
@@ -21,7 +21,7 @@ const getById = asyncHandler(async (req, res) => {
         return res.status(404).send({message: "Product not found"})
     }
 
-    res.status(200).send({
+    return res.status(200).json({
         product
     })
 })
