@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { selectCurrCart } from "../features/cart/cartSlice";
 import { useIncrFromCartMutation, useDecrFromCartMutation } from "../features/cart/cartApiSlice";
+import { Link } from "react-router-dom";
 
 export default function Cart() {
     const cart = useSelector(selectCurrCart)
@@ -22,6 +23,7 @@ export default function Cart() {
 
     return (
         <div className="items"> 
+            <div>Cart:</div>
             {cart && 
                 cart.map((item, idx) => 
                     <div className="item" key={item._id}>
@@ -35,6 +37,8 @@ export default function Cart() {
                     </div>
                 )
             } 
+
+            <Link to="/checkout">Checkout</Link>
         </div> 
     )
 }
