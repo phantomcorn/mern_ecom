@@ -17,7 +17,7 @@ export const authApiSlice = apiSlice.injectEndpoints({ //Any auth api is injecte
         }),
 
         restore: builder.query({//builder query
-            query: () => '/api/cart/get',
+            query: () => '/api/cart/',
             async onQueryStarted(arg, {dispatch, queryFulfilled}) { //if query succesful, we automatically set our new state
                 try {
               
