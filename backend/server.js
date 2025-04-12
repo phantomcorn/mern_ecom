@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import connectDB from './db/database.js'
 import cartRoute from './routes/cartRoute.js'
 import productRoute from './routes/productRoute.js'
-import verifyJWT from './middleware/verifyJWT.js';
+import checkoutRoute from './routes/checkoutRoute.js'
 
 //Deploy a server which acts as a backend
 //Our frontend will make request to this backend which then communicates with the database
@@ -55,6 +55,7 @@ app.use("/api/cart", cartRoute)
     Handles getting user data
 */
 app.use("/api/product", productRoute)
+app.use("/api/checkout", checkoutRoute)
 
 
 // Any other request are rejected
