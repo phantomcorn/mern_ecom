@@ -1,20 +1,45 @@
 import asyncHandler from 'express-async-handler'
 import Product from '../models/productModel.js'
+import stripe from '../db/stripe.js'
 
 // @route GET /api/product
 const getAll = asyncHandler(async (req, res) => {
 
-    const products = await Product.find({}) //get all products
+    // Get all active products 
+    const productsResp = await stripe.products.list({ active: true }) 
+    // Get all prices 
+    const pricesResp = await stripe.prices.list({ 
+        expand: ['data.product'], // optional: expands product info inside price
+    });
+    
+    /* Match product ID to its price ID
+        Price are in unit amount (aka £1 = 100) 
+            => check by currency and convert to standard price
+    */
+    const productPriceMap = productsResp.data.map(product => { 
+        const productPrices = pricesResp.data.filter(price => price.product.id === product.id);
+        return {
+            ...product,
+            prices: productPrices.map((productPrice) => productPrice.unit_amount),
+            currencies: productPrices.map((productPrice) => productPrice.currency)
+        };
+    });
+
     //return result to frontend
-    res.status(200).json({
-        products
+    return res.status(200).json({
+        products: productPriceMap
     })
 })
 
 // @router GET /api/product/:productId
 const getById = asyncHandler(async (req, res) => {
     const {productId} = req.params
-    const product = await Product.findOne({_id: productId}) //get all products
+    const product = await stripe.products.retrieve(productId)
+
+    // Get all prices for a product
+    const prices = await stripe.prices.list({
+        product: product.id
+    })
     
     //return result to frontend
     if (!product) {
@@ -22,7 +47,8 @@ const getById = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json({
-        product
+        ...product,
+        prices: prices.data
     })
 })
 
