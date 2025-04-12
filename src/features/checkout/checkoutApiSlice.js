@@ -9,8 +9,12 @@ export const checkoutApiSlice = apiSlice.injectEndpoints({
                 body: {...cart}
             }),
             invalidatesTags: ["Checkout"]
+        }),
+        getSession: builder.query({
+            query: payload => `/api/checkout/${payload.id}`,
+            providesTags: ["Checkout"]
         })
     })
 })
 
-export const {useStartCheckoutMutation} = checkoutApiSlice
+export const {useStartCheckoutMutation, useGetSessionQuery} = checkoutApiSlice
