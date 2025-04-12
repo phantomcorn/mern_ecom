@@ -20,9 +20,9 @@ const createSession = asyncHandler(async (req,res) => {
     })
 
     if (!session) {
-        res.status(404).send({message: "Error creating new session"});
+        return res.status(404).send({message: "Error creating new session"});
     }
-    res.status(200).json({clientSecret: session.client_secret});
+    return res.status(200).json({clientSecret: session.client_secret});
 })
 
 export {createSession}
