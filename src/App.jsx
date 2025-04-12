@@ -4,10 +4,12 @@ import Main from './pages/Main';
 import NoPage from './pages/NoPage';
 import Products from './pages/Products.jsx';
 import Product from './pages/Product.jsx';
+import Checkout from './pages/Checkout.jsx';
 import { store } from './app/store';
 import { Provider } from 'react-redux';
 import Prefetch from './features/cart/Prefetch.jsx';
 import PersistCart from './features/cart/PersistCart.jsx';
+import Return from './pages/Return.jsx';
 
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
               <Route element={<Prefetch/>}> 
                 <Route path="/product" element={<Products />} />
                 <Route path="/product/:id" element={<Product />} />
+                <Route path="/checkout" element={<Checkout/>} />
+                <Route path="/return/:sessionId" element={<Return/>} />
                 <Route path="/" element={<Main />} />
                 <Route index element={<Main />} />
               </Route>
