@@ -1,8 +1,5 @@
 import asyncHandler from "express-async-handler"
-import useStripe from "stripe"
-
-const stripe = useStripe(process.env.STRIPE_BACKEND_KEY)
-
+import stripe from "../db/stripe.js";
 const YOUR_DOMAIN = process.env.VITE_APP_BASE_URL;
 
 // @route POST /api/checkout/create-checkout-session
