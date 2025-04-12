@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import { useGetProductQuery } from "../features/product/productApiSlice";
 import { setCart } from "../features/cart/cartSlice";
+import getPrice from "../features/product/priceConversion";
 
 export default function Product() {
 
@@ -26,13 +27,15 @@ export default function Product() {
 
   if (productResp.isSuccess) {
 
-    const product = productResp.data.product
+    const product = productResp.data
+    const priceObj = product.prices[0]
+    const price = getPrice(priceObj.currency,priceObj.unit_amount)
 
     return (
       <div>
         <h1>Product Page</h1>
-        <p>Product ID:{product._id} </p>
-        <p>Price: {product.price}</p>
+        <p>Product ID:{product.id} </p>
+        <p>Price: {price}</p>
         <button onClick={handleClick}>
           {isUninitialized && "Add to cart"}
           {isLoading && "Adding..."}

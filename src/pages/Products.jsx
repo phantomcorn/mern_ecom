@@ -1,5 +1,6 @@
 import { useGetAllProductQuery } from "../features/product/productApiSlice.js"
 import { useNavigate, Link } from "react-router-dom"
+import getPrice from "../features/product/priceConversion.js"
 
 export default function Dashboard() {
 
@@ -9,17 +10,20 @@ export default function Dashboard() {
         refetchOnFocus: true,
         refetchOnMountOrArgChange: true
     })
-
+    
 
     if (isError) return <div> Error </div>
     if (isLoading) return <div> Loading... </div>
+
     return (
         <div className="products">
             <div> All Products</div>
             {data && data.products &&
                 data.products.map((product) => (
-                    <Link key={product._id} to={`/product/${product._id}`}>
-                        {product.name}
+
+                    <Link key={product.id} to={`/product/${product.id}`}>
+                        <div>{product.name}</div>
+                        <div>{getPrice(product.currencies[0],product.prices[0])}</div>
                     </Link>
                 ))            
             }
