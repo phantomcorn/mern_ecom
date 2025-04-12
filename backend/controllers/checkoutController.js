@@ -25,4 +25,15 @@ const createSession = asyncHandler(async (req,res) => {
     return res.status(200).json({clientSecret: session.client_secret});
 })
 
-export {createSession}
+// @route GET /api/checkout/:checkoutId
+const getSession = asyncHandler(async (req,res) => {
+    const {checkoutId} = req.params
+    if (!checkoutId) return res.status(404).json({message: "No session provided"})
+    const session = await stripe.checkout.sessions.retrieve(checkoutId)
+
+    if (!session) return res.status(404).json({message: "No session found"})
+
+    return res.status(200).json({...session})
+})
+
+export {createSession, getSession}
