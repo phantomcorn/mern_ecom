@@ -10,6 +10,8 @@ import { Provider } from 'react-redux';
 import Prefetch from './features/cart/Prefetch.jsx';
 import PersistCart from './features/cart/PersistCart.jsx';
 import Return from './pages/Return.jsx';
+import Login from './pages/Login.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
                 <Route path="/product/:id" element={<Product />} />
                 <Route path="/checkout" element={<Checkout/>} />
                 <Route path="/return/:sessionId" element={<Return/>} />
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/" element={<Main />} />
                 <Route index element={<Main />} />
               </Route>

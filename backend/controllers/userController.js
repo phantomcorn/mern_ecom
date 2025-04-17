@@ -22,7 +22,7 @@ const getOrders = asyncHandler(async (req,res) => {
     })
 
     if (!sessions) return res.status(200).json({message: "No orders found", orders: []})
-    return res.status(200).json({orders: sessions})
+    return res.status(200).json({email: email, orders: sessions})
 })
 
 
