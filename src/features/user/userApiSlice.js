@@ -1,6 +1,6 @@
 import { apiSlice } from "../../app/api/apiSlice";
 
-export const orderApiSlice = apiSlice.injectEndpoints({
+export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getOrders: builder.query({
             query: payload => ({
@@ -20,4 +20,4 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 export const {
     useGetOrdersQuery,
     useGetOrderQuery
-} = orderApiSlice
+} = userApiSlice
