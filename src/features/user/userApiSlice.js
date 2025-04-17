@@ -4,13 +4,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getOrders: builder.query({
             query: payload => ({
-                url: "/api/order",
+                url: "/api/user/order",
                 body: payload
             })
         }),
         getOrder: builder.query({
             query: payload => ({
-                url: `/api/order/${payload.checkoutId}`,
+                url: `/api/user/order/${payload.checkoutId}`,
             })
         }),
 

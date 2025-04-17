@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"; //from "@reduxjs/toolkit/query/" will not give you react hook for endpoints
-
+import { setCredentials } from "../../features/auth/authSlice";
 const baseQuery = fetchBaseQuery(
   {
     baseUrl: import.meta.env.VITE_APP_BACKEND_URL,
     credentials: "include",
     prepareHeaders: ((headers, {getState}) => {
-      const token = getState().cart.token // cartSlice token
+      const token = getState().auth.token // authSlice token
       if (token) {
         headers.set("authorization", `Bearer ${token}`)
       }
