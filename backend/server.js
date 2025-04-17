@@ -5,6 +5,7 @@ import connectDB from './db/database.js'
 import cartRoute from './routes/cartRoute.js'
 import productRoute from './routes/productRoute.js'
 import checkoutRoute from './routes/checkoutRoute.js'
+import orderRoute from './routes/orderRoute.js'
 
 //Deploy a server which acts as a backend
 //Our frontend will make request to this backend which then communicates with the database
@@ -56,6 +57,7 @@ app.use("/api/cart", cartRoute)
 */
 app.use("/api/product", productRoute)
 app.use("/api/checkout", checkoutRoute)
+app.use("/api/order", orderRoute)
 
 
 // Any other request are rejected
