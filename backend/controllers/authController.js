@@ -118,4 +118,4 @@ const verify = asyncHandler(async (req, res) => {
 // }
 
 
-export {create, verify, refresh, logout}
+export {create, verify}
