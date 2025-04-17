@@ -7,8 +7,9 @@ export default function Main() {
 
     return (
         <div className="App">
-            <Link to="product">Products</Link>
+            <Link to="product">All Products</Link>
             <Cart/>
+            <Link to="login">Manage my order</Link>
         </div>
     )
 }
