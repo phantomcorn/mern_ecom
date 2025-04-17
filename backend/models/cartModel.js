@@ -9,6 +9,7 @@ const cartSchema = new mongoose.Schema({
     session: {type: String, required: true, unique: true},
     products : [{
         productId: {type: String, required: true},
+        priceId: {type: String, required: true},
         quantity:  {type: Number, required: true},
     }],
     createdAt: {type: Date, expires: '7d' , default: Date.now}
