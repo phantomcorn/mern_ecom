@@ -3,7 +3,7 @@ import { getOrder, getOrders } from "../controllers/userController.js"
 
 const router = express.Router()
 
-router.get("/", getOrders)
-router.get("/:checkoutId", getOrder)
+router.get("/order", getOrders)
+router.get("/order/:checkoutId", getOrder)
 
 export default router
