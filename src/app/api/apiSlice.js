@@ -14,13 +14,38 @@ const baseQuery = fetchBaseQuery(
   }
 )
 
+const baseQueryWithReauth = async (args, api, extraOptions) => {
+
+  let result = await baseQuery(args, api, extraOptions)
+
+  if (result?.error?.status === 403) { //Invalid(Expired) access token
+    const refreshResult = await baseQuery("/api/auth/refresh", api, extraOptions)
+    if (refreshResult?.data) {
+
+      // store new access token
+      api.dispatch(setCredentials({...refreshResult.data}))
+
+      // retry original query with new token
+      result = await baseQueryWithReauth(args, api, extraOptions)
+
+    } else {
+
+      if (refreshResult?.error?.status === 403) {
+        refreshResult.error.data.message = "Your login session has expired. Please login again"
+      }
+      return refreshResult
+
+    }
+  }
+  return result
+}
 /* 
   Main apiSlice (Allow us to define our baseQuery once)
   We inject different endpoints from different files to this apiSlice 
 */
 export const apiSlice = createApi(
   {
-    baseQuery: baseQuery,
+    baseQuery: baseQueryWithReauth,
     tagTypes: ["Product", "Cart", "Checkout"],
     endpoints: builder => ({})
   }
