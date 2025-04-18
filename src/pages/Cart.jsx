@@ -38,7 +38,7 @@ export default function Cart() {
                 )
             } 
 
-            <Link to="/checkout">Checkout</Link>
+            {cart.length > 0 && <Link to="/checkout">Checkout</Link>}
         </div> 
     )
 }
