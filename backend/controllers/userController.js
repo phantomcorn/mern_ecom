@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler"
 import stripe from '../db/stripe.js'
 
 
-// @route GET /api/order/:checkoutId
+// @route GET /api/user/order/:checkoutId
 const getOrder = asyncHandler(async (req,res) => {
     
     const {checkoutId} = req.params
@@ -12,7 +12,7 @@ const getOrder = asyncHandler(async (req,res) => {
     return res.status(200).json({order: session})
 })
 
-// @route GET /api/order
+// @route GET /api/user/order
 const getOrders = asyncHandler(async (req,res) => {
     /* An order is a checkout session that has been fullfilled */
     const {email} = req.body
