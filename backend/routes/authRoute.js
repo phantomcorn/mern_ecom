@@ -5,7 +5,7 @@
     Any request to <BASE_URL>/api/auth/ is further directed to the correct backend logic here
 */
 import express from "express"
-import {create, verify} from "../controllers/authController.js"
+import {create, verify, refresh} from "../controllers/authController.js"
 import loginLimiter from "../middleware/loginLimiter.js"
 const router = express.Router();
 
@@ -30,7 +30,7 @@ router.post("/verify", verify)
     <BASE_URL>/api/auth/refresh
     Generate a new access token when expired
 */
-// router.get("/refresh", refresh) 
+router.get("/refresh", refresh) 
 
 /*  
     <BASE_URL>/api/auth/logout

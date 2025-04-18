@@ -16,3 +16,5 @@ const authSlice = createSlice({
 export const { setCredentials } = authSlice.actions
 
 export default authSlice.reducer //add to store
+
+export const selectCurrToken = (state) => state.auth.token

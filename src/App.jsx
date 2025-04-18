@@ -12,6 +12,7 @@ import PersistCart from './features/cart/PersistCart.jsx';
 import Return from './pages/Return.jsx';
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import PersistLogin from './features/auth/PersistLogin.jsx';
 
 
 function App() {
@@ -19,21 +20,23 @@ function App() {
     <Provider store={store}>
       <BrowserRouter>
           <Routes>
-            <Route element={<PersistCart/>}>
-              {/* Persists data for every child page under Prefetch*/}
-              <Route element={<Prefetch/>}> 
-                <Route path="/product" element={<Products />} />
-                <Route path="/product/:id" element={<Product />} />
-                <Route path="/checkout" element={<Checkout/>} />
-                <Route path="/return/:sessionId" element={<Return/>} />
-                <Route path="/login" element={<Login/>}/>
-                <Route path="/dashboard" element={<Dashboard/>}/>
-                <Route path="/" element={<Main />} />
-                <Route index element={<Main />} />
+              <Route element={<PersistCart/>}>
+                {/* Persists data for every child page under Prefetch*/}
+                <Route element={<Prefetch/>}> 
+                  <Route path="/product" element={<Products />} />
+                  <Route path="/product/:id" element={<Product />} />
+                  <Route path="/checkout" element={<Checkout/>} />
+                  <Route path="/return/:sessionId" element={<Return/>} />
+                  <Route element={<PersistLogin/>}>
+                    <Route path="/dashboard" element={<Dashboard/>}/>
+                  </Route>
+                  <Route path="/" element={<Main />} />
+                  <Route index element={<Main />} />
+                </Route>
               </Route>
-            </Route>
-        
-            
+
+            <Route path="/login" element={<Login/>}/>
+
             {/* Fallback route for unmatched paths */}
             <Route path="*" element={<NoPage />} />
    

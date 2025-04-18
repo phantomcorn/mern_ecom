@@ -72,41 +72,41 @@ const verify = asyncHandler(async (req, res) => {
 })
 
 
-// @route GET /api/auth/refresh
-// const refresh = (req,res) => { 
+//@route GET /api/auth/refresh
+const refresh = (req,res) => { 
 
-//     const cookies = req.cookies
-//     if (!cookies?.jwt) return res.status(401).send({message: "Unauthorized (No cookies)"})
+    const cookies = req.cookies
+    if (!cookies?.jwt) return res.status(401).send({message: "Unauthorized (No cookies)"})
 
-//     //retrieve the refresh token that was stored in the cookie back from our intial login
-//     const refreshToken = cookies.jwt
+    //retrieve the refresh token that was stored in the cookie back from our intial login
+    const refreshToken = cookies.jwt
 
-//     /*  
-//         Decode refresh token and compare against REFRESH_TOKEN_SECRET
-//         If valid, we get back the original payload content use to create our refresh token
-//         and we generate a new access token
-//     */
-//     jwt.verify(refreshToken,
-//         process.env.REFRESH_TOKEN_SECRET,
-//         asyncHandler(async (err, decoded) => {
-//             if (err) return res.status(403).send({message: "Forbidden (Invalid refresh token)"})
+    /*  
+        Decode refresh token and compare against REFRESH_TOKEN_SECRET
+        If valid, we get back the original payload content use to create our refresh token
+        and we generate a new access token
+    */
+    jwt.verify(refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
+        asyncHandler(async (err, decoded) => {
+            if (err) return res.status(403).send({message: "Forbidden (Invalid refresh token)"})
             
-//             //refresh token valid => create new access token
-//             const accessToken = jwt.sign(
-//                 {
-//                     "UserInfo": {
-//                         "email": decoded.email
-//                     }
+            //refresh token valid => create new access token
+            const accessToken = jwt.sign(
+                {
+                    "UserInfo": {
+                        "email": decoded.email
+                    }
         
-//                 },  
-//                 process.env.ACCESS_TOKEN_SECRET,
-//                 { expiresIn: "5m" }
-//             )
+                },  
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: "5m" }
+            )
 
-//             res.json({ token: accessToken })
-//         })
-//     )
-// }
+            res.json({ token: accessToken })
+        })
+    )
+}
 
 // // @route POST /api/auth/logout
 // // If exist, clear browser's jwt cookie
@@ -118,4 +118,4 @@ const verify = asyncHandler(async (req, res) => {
 // }
 
 
-export {create, verify}
+export {create, verify, refresh}
