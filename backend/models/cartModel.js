@@ -12,7 +12,7 @@ const cartSchema = new mongoose.Schema({
         priceId: {type: String, required: true},
         quantity:  {type: Number, required: true},
     }],
-    createdAt: {type: Date, expires: '7d' , default: Date.now}
+    createdAt: {type: Date, expires: 3 * 24 * 60 * 60 * 1000, default: Date.now}
 })
 
 //REST API on ThreadsDB.carts

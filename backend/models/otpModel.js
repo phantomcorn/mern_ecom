@@ -11,7 +11,7 @@ const otpSchema = new mongoose.Schema({
     createdAt: {type: Date, default: Date.now, expires: 300}
 })
 
-//REST API on ThreadsDB.carts
+//REST API on ThreadsDB.otp
 const Otp = mongoose.model("otp",otpSchema)
 
 export default Otp;

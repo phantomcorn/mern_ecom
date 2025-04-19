@@ -7,7 +7,7 @@ const getCart = asyncHandler(async (req,res) => {
     if (!session) return res.status(200).json({products: [], message: "Session expired"})
 
     const cart = await Cart.findOne({session: session})
-    if (!cart) return res.status(200).json({products: [], message: "Session expired"})
+    if (!cart) return res.status(200).json({products: [], message: "No Cart"})
 
     return res.status(200).json({products: cart.products})
 })
@@ -29,7 +29,7 @@ const addToCart = asyncHandler(async (req,res) => {
             httpOnly: true, //accessible only by web server
             secure: true, //use https protocol
             sameSite: "none", //cross-site cookie
-            maxAge: 7 * 24 * 60 * 60 * 1000 //match expiryDate in Cart (7d in ms)
+            maxAge: 3 * 24 * 60 * 60 * 1000 //match expiryDate in Cart (3d in ms)
         })
 
         return res.status(200).json({message: "Cart updated (session created)"})
@@ -56,7 +56,7 @@ const addToCart = asyncHandler(async (req,res) => {
                 httpOnly: true, //accessible only by web server
                 secure: true, //use https protocol
                 sameSite: "none", //cross-site cookie
-                maxAge: 7 * 24 * 60 * 60 * 1000 //match expiryDate in Cart (7d in ms)
+                maxAge: 3 * 24 * 60 * 60 * 1000 //match expiryDate in Cart (3d in ms)
             })
         }
 
@@ -122,4 +122,13 @@ const incrFromCart = asyncHandler(async (req,res) => {
     res.status(200).json({message: "Cart updated succesfully!"})
 })
 
-export { getCart, addToCart, decrFromCart, incrFromCart }
+const clearCart = asyncHandler(async (req,res) => {
+
+    const session = req.cookies.SESSION
+    
+    await Cart.deleteOne({session})
+
+    return res.status(200).json({message: "Cart cleared"})
+})
+
+export { getCart, addToCart, decrFromCart, incrFromCart, clearCart }

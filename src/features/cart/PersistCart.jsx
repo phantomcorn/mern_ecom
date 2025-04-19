@@ -13,7 +13,6 @@ const PersistCart = () => {
     const [trueSuccess, setTrueSuccess] = useState(false)
 
     const {
-        data,
         isLoading,
         isSuccess, //bug: isSuccess can be true before setCredentials is set => add trueSuccess flag
         isError,
@@ -47,7 +46,7 @@ const PersistCart = () => {
         */
         content = <div> Loading... </div>
     } else if (isError) { 
-        console.log("Error")
+        console.log("Error persisting cart")
         /*
             data: no 
         */
