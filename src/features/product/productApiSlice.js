@@ -4,11 +4,12 @@ export const productApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getAllProduct: builder.query({
             query: () => "/api/product",
+            providesTags: ["Product"]
         }),
         getProduct: builder.query({
-            query: payload => `/api/product/${payload.id}`
-        }),
-        provideTags: ["Product"] // Result cached with the label User (Is retrieved again in cache only if subscribed)
+            query: payload => `/api/product/${payload.id}`,
+            provideTags: ["Product"]
+        })
         /*
             If a mutation endpoint is called and provides an `invalidateTags: ["User"]`,
             Any cached query providing tag of "User" will be invalidated and 

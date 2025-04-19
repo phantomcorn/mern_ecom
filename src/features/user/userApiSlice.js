@@ -6,12 +6,12 @@ export const userApiSlice = apiSlice.injectEndpoints({
             query: payload => ({
                 url: "/api/user/order",
                 body: payload
-            })
+            }),
+            providesTags: ["Order"]
         }),
         getOrder: builder.query({
-            query: payload => ({
-                url: `/api/user/order/${payload.checkoutId}`,
-            })
+            query: payload => `/api/user/order/${payload.id}`,
+            providesTags: ["Order"]
         }),
 
     })

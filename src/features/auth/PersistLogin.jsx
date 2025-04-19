@@ -34,7 +34,7 @@ const PersistLogin = () => {
                     await refresh() //call refresh authApiSlice
 
                     // { token } = response.data
-
+                    console.log("Access token granted")
                     setTrueSuccess(true)
                 } catch (err) {
                     console.log(err)
@@ -74,10 +74,11 @@ const PersistLogin = () => {
         console.log("Persist success")
         /*
             cart : yes
-            calling restore is successful and we given enough time for setCart
+            calling restore is successful and we given enough time for setCredentials
         */
         content = <Outlet/>
     } 
+
     return content
 }
 

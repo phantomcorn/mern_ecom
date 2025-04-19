@@ -12,7 +12,9 @@ export const authApiSlice = apiSlice.injectEndpoints({ //Any auth api is injecte
                 url: '/api/auth/create',
                 method: 'POST',
                 body: credentials
-            })
+            }),
+            providesTags: ["Auth"],
+            invalidatesTags: ["Auth"]
         }),
         verify: builder.mutation({
             query: credentials => ({
@@ -20,6 +22,8 @@ export const authApiSlice = apiSlice.injectEndpoints({ //Any auth api is injecte
                 method: "POST",
                 body: credentials
             }),
+            providesTags: ["Auth"],
+            invalidatesTags: ["Auth"]
         }),
         refresh: builder.mutation({
             query: () => "api/auth/refresh",
@@ -27,13 +31,12 @@ export const authApiSlice = apiSlice.injectEndpoints({ //Any auth api is injecte
                 try {
                     const {data} = await queryFulfilled
                     dispatch(setCredentials({token: data.token}))
-                    // console.log("user refreshd!")
                 } catch (err) {
                     console.log(err)
                 }
             },
-            invalidatesTags: ["Auth"],
-            providesTags: ["Auth"]
+            providesTags: ["Auth"],
+            invalidatesTags: ["Auth", "Product", "Order"],
         })
 
     })
