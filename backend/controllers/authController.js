@@ -11,6 +11,7 @@ import sendEmail from '../utils/sendEmail.js'
 
 import jwt from "jsonwebtoken"
 import { generateOTP, verifyOTP } from '../utils/otp.js'
+import Otp from '../models/otpModel.js'
 
 // @route POST /api/auth/create
 const create = asyncHandler(async (req, res) => {
@@ -24,6 +25,11 @@ const create = asyncHandler(async (req, res) => {
     const otp = generateOTP()
     await sendEmail(email, otp)
 
+    await Otp.create({
+        otp,
+        email
+    })
+
     //return result to frontend
     res.status(200).send({
         message: `OTP sent to ${email}`
@@ -36,9 +42,11 @@ const verify = asyncHandler(async (req, res) => {
     const { email, otp } = req.body;
     if (!otp) return res.status(400).json({message: "Missing parameter"})
 
+    const query = await Otp.findOne({email, otp})
+    if (!query) return res.status(404).send({message: "Erorr verifying OTP (no account found)"})
+    
     const verified = verifyOTP(otp)
     if (!verified) return res.status(403).send({message: "Incorrect code"})
-        
     
     /* Successful => generate access token */
     const accessToken = jwt.sign(
@@ -67,6 +75,9 @@ const verify = asyncHandler(async (req, res) => {
         sameSite: "none", //cross-site cookie
         maxAge: 6 * 60 * 60 * 1000//set to match refreshToken expiry (6h in ms)
     })
+
+    // delete otp entry once used
+    await query.deleteOne()
 
     res.status(200).send({message: "Verified", token: accessToken})
 })
