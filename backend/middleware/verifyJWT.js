@@ -16,7 +16,7 @@ const verifyJWT = (req, res, next) => {
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
             if (err) return res.status(403).json({message : "Forbidden"})
-            req.email = decoded.UserInfo.user //matches payload structure when we first generated the token
+            req.body = {email : decoded.UserInfo.email} //matches payload structure when we first generated the token
             // console.log("Verify JWT success")
             next()
         }

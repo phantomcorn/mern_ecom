@@ -6,100 +6,53 @@
 */
 
 import asyncHandler from 'express-async-handler'
-import Account from "../models/accountModel.js"
 import validateEmail from '../utils/validateEmail.js'
 import sendEmail from '../utils/sendEmail.js'
-// Hash function
-import bcrypt from "bcrypt"
-import crypto from "crypto"
+
 import jwt from "jsonwebtoken"
+import { generateOTP, verifyOTP } from '../utils/otp.js'
+import Otp from '../models/otpModel.js'
 
 // @route POST /api/auth/create
 const create = asyncHandler(async (req, res) => {
-    const {email, password} = req.body
-    if (!email || !password) return res.status(400).send({message: "A field is currently missing"})
+    const {email} = req.body
+    if (!email) return res.status(400).send({message: "No email provided"})
     if (!validateEmail(email)) return res.status(400).send({message: "The email you have provided is not in the correct format"})
     
-    let user = await Account.findOne({email: email})
-    if (user) return res.status(409).send({message: "Email already taken"})
+    // Check if user has any completed session => if not, no user found
+    /* TO BE IMPLEMENTED */
     
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-    //create new account
-    const newAccount = await Account.create({
-        email, 
-        password: hashedPassword,
-        didVerify: false
+    const otp = generateOTP()
+    await sendEmail(email, otp)
+
+    await Otp.create({
+        otp,
+        email
     })
 
-    const verificationToken = newAccount.getVerificationToken()
-    const verificationLink = `${process.env.VITE_APP_BASE_URL}/verify-email?id=${newAccount._id}&verifyToken=${verificationToken}`
-    await sendEmail(email, verificationLink)
-    //save account details to mongoDB  
-    newAccount.save()
     //return result to frontend
     res.status(200).send({
-        email: email,
-        message: "Account succesfully registered, please verify your email"
+        message: `OTP sent to ${email}`
     })
     
 })
 
-// @route POST /api/auth/verify-email
-const verifyEmail = asyncHandler(async (req, res) => {
-    const { id, verifyToken } = req.body;
-    if (!id || !verifyToken) return res.status(400).json({message: "Missing verify email parameters"})
+// @route POST /api/auth/verify
+const verify = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+    if (!otp) return res.status(400).json({message: "Missing parameter"})
 
-    const hashedToken = crypto.createHash("sha256").update(verifyToken).digest("hex")
-
-    const user = await Account.findOne({
-        _id: id,
-        verifyToken: hashedToken,
-        verifyTokenExpire: {$gt: new Date()} //verification token not expired
-    })
-
-    if (!user) return res.status(403).send({message: "Invalid or expired token"})
-    user.didVerify = true
-    user.verifyToken = undefined
-    user.verifyTokenExpire = undefined
-    await user.save()
-        
-    res.status(200).send({message: "Email verified succesfully"})
+    const query = await Otp.findOne({email, otp})
+    if (!query) return res.status(404).send({message: "Erorr verifying OTP (no account found)"})
     
-})
-
-// @route POST /api/auth/
-const login = asyncHandler(async (req,res) => {
-
-    const {email, password} = req.body
-    if (!email || !password) return res.status(400).send({message: "A field is currently missing"})
-    if (!validateEmail(email)) return res.status(400).send({message: "The email you have provided is not in the correct format"})
-
-    let user = await Account.findOne({email: email})
-    if (!user) return res.status(404).send({message: "No account associated with the provided email"})
+    const verified = verifyOTP(otp)
+    if (!verified) return res.status(403).send({message: "Incorrect code"})
     
-    const match = await bcrypt.compare(password, user.password)
-    if (!match) return res.status(400).send({message: "Incorrect password"})
-
-    //login credentials matched
-    if (!user.didVerify) { //user has not verified their email
-        if (Date.now() > user.verifyTokenExpire) { //if verification link expired
-            const verificationToken = user.getVerificationToken()
-            const verificationLink = `${process.env.VITE_APP_BASE_URL}/verify-email?id=${user._id}&verifyToken=${verificationToken}`
-            await sendEmail(email, verificationLink)
-            //update account details to mongoDB  
-            user.save()
-            return res.status(200).send({email: user.email, didVerify: user.didVerify, message: "We have sent you a new email verification, please verify them before you can use your account"})
-        } else { //email not verified (not expired)
-            return res.status(200).send({email: user.email, didVerify: user.didVerify, message: "Email not verified"})
-        }   
-    } 
-        
-    //create(encode) access token
+    /* Successful => generate access token */
     const accessToken = jwt.sign(
         {
             "UserInfo": {
-                "user": user.email
+                "email": email
             }
 
         },  
@@ -109,7 +62,7 @@ const login = asyncHandler(async (req,res) => {
 
     //create(encode) refresh token
     const refreshToken = jwt.sign(
-        {"user": user.email},
+        {"email": email},
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "6h" } //expiry used to check against jwt.verify()
     )
@@ -123,15 +76,14 @@ const login = asyncHandler(async (req,res) => {
         maxAge: 6 * 60 * 60 * 1000//set to match refreshToken expiry (6h in ms)
     })
 
-    //user did verify their email => login as normal
-    res.status(200).json({
-        email: user.email, 
-        didVerify: user.didVerify, //true
-        token: accessToken//send access token to be use for subsequent API calls
-    })  
+    // delete otp entry once used
+    await query.deleteOne()
+
+    res.status(200).send({message: "Verified", token: accessToken})
 })
 
-// @route GET /api/auth/refresh
+
+//@route GET /api/auth/refresh
 const refresh = (req,res) => { 
 
     const cookies = req.cookies
@@ -149,14 +101,12 @@ const refresh = (req,res) => {
         process.env.REFRESH_TOKEN_SECRET,
         asyncHandler(async (err, decoded) => {
             if (err) return res.status(403).send({message: "Forbidden (Invalid refresh token)"})
-            const user = await Account.findOne({email: decoded.user})
-
-            if (!user) return res.status(401).send({message: "Unauthorized (No user found)"})
+            
             //refresh token valid => create new access token
             const accessToken = jwt.sign(
                 {
                     "UserInfo": {
-                        "user": user.email
+                        "email": decoded.email
                     }
         
                 },  
@@ -169,14 +119,14 @@ const refresh = (req,res) => {
     )
 }
 
-// @route POST /api/auth/logout
-// If exist, clear browser's jwt cookie
-const logout = (req,res) => {
-    const cookies = req.cookies
-    if (!cookies?.jwt) return res.status(204).json({message: "No content"})
-    res.clearCookie('jwt', {httpOnly: true, sameSite: "none", secure: true})
-    res.status(200).json({ message: "Cookies cleared"})
-}
+// // @route POST /api/auth/logout
+// // If exist, clear browser's jwt cookie
+// const logout = (req,res) => {
+//     const cookies = req.cookies
+//     if (!cookies?.jwt) return res.status(204).json({message: "No content"})
+//     res.clearCookie('jwt', {httpOnly: true, sameSite: "none", secure: true})
+//     res.status(200).json({ message: "Cookies cleared"})
+// }
 
 
-export {create, verifyEmail, login, refresh, logout}
+export {create, verify, refresh}
