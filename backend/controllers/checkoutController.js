@@ -76,11 +76,14 @@ const fulfillCheckout = async (sessionId, customerDetails) => {
         const email = customerDetails.email
         const order = checkoutSession.metadata.order_id
         const shippingAddress = customerDetails.address
+        shippingAddress.name = customerDetails.name // add new field
         const products = checkoutSession.line_items.data.map((item) => (
             {
                 productId: item.id,
                 description: item.description,
                 priceId: item.price.id,
+                unitPrice: item.price.unit_amount,
+                currency: item.currency,
                 quantity: item.quantity
             }
         ))
