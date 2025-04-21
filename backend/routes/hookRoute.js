@@ -16,7 +16,9 @@ const hookRoute = async (req,res) => {
       event.type === 'checkout.session.completed'
       || event.type === 'checkout.session.async_payment_succeeded'
     ) {
-      fulfillCheckout(event.data.object.id);
+
+      const customerDetails = event.data.object.customer_details
+      fulfillCheckout(event.data.object.id, customerDetails);
     }
 
     res.status(200).end();
