@@ -44,4 +44,31 @@ const getSession = asyncHandler(async (req,res) => {
     return res.status(200).json({...session})
 })
 
-export {createSession, getSession}
+//  @route POST /hooks triggered on event: checkout.session.completed
+const fulfillCheckout = async (sessionId) => {
+
+    console.log('Fulfilling Checkout Session ' + sessionId);
+
+    // TODO: Make this function safe to run multiple times,
+    // even concurrently, with the same session ID
+  
+    // TODO: Make sure fulfillment hasn't already been
+    // performed for this Checkout Session
+  
+    // Retrieve the Checkout Session from the API with line_items expanded
+    const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items'],
+    });
+  
+    console.log(checkoutSession)
+    // Check the Checkout Session's payment_status property
+    // to determine if fulfillment should be performed
+    if (checkoutSession.payment_status !== 'unpaid') {
+      // TODO: Perform fulfillment of the line items
+  
+      // TODO: Record/save fulfillment status for this
+      // Checkout Session
+    }
+}
+
+export {createSession, getSession, fulfillCheckout}

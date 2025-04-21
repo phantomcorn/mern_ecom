@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './db/database.js'
@@ -8,6 +9,7 @@ import checkoutRoute from './routes/checkoutRoute.js'
 import authRoute from "./routes/authRoute.js"
 import userRoute from './routes/userRoute.js'
 import verifyJWT from './middleware/verifyJWT.js';
+import hookRoute from './routes/hookRoute.js';
 
 //Deploy a server which acts as a backend
 //Our frontend will make request to this backend which then communicates with the database
@@ -34,6 +36,9 @@ const app = express();
 */
 // Connect backend to MongoDB
 connectDB()
+
+// Webhooks 
+app.post("/hooks", bodyParser.raw({type: 'application/json'}), hookRoute)
 
 app.use(express.json())
 // app.use(express.urlencoded({extended: false}))
