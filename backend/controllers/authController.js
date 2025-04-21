@@ -84,7 +84,7 @@ const verify = asyncHandler(async (req, res) => {
 
 
 //@route GET /api/auth/refresh
-const refresh = asyncHandler(async (req, res) => { 
+const refresh = (req, res) => { 
 
     const cookies = req.cookies
     if (!cookies?.jwt) return res.status(401).send({message: "Unauthorized (No cookies)"})
@@ -117,7 +117,7 @@ const refresh = asyncHandler(async (req, res) => {
             res.json({ token: accessToken })
         })
     )
-})
+}
 
 // // @route POST /api/auth/logout
 // // If exist, clear browser's jwt cookie
