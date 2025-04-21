@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler"
 import stripe from "../db/stripe.js";
 import getNextOrderNumber from "../utils/orderNumber.js";
+import Order from "../models/orderModel.js";
 const YOUR_DOMAIN = process.env.VITE_APP_BASE_URL;
 
 // @route POST /api/checkout/create-checkout-session
@@ -15,6 +16,9 @@ const createSession = asyncHandler(async (req,res) => {
         line_items: line_items,
         metadata: {
             order_id
+        },
+        shipping_address_collection: {
+            allowed_countries: ["GB"]
         },
         //[
             // {
@@ -44,4 +48,62 @@ const getSession = asyncHandler(async (req,res) => {
     return res.status(200).json({...session})
 })
 
-export {createSession, getSession}
+//  @route POST /hooks triggered on event: checkout.session.completed
+const fulfillCheckout = async (sessionId, customerDetails) => {
+
+    console.log('Fulfilling Checkout Session ' + sessionId);
+
+    // TODO: Make this function safe to run multiple times,
+    // even concurrently, with the same session ID
+    var order = await Order.findOne({session: sessionId})
+    // TODO: Make sure fulfillment hasn't already been
+    // performed for this Checkout Session
+    if (order && order.fulfilled) {
+        console.log("Order existed and fulfilled")
+        return
+    } 
+    
+    // Retrieve the Checkout Session from the API with line_items expanded
+    const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items'],
+    });
+
+    // Check the Checkout Session's payment_status property
+    // to determine if fulfillment should be performed
+    if (checkoutSession.payment_status !== 'unpaid') {
+      // TODO: Perform fulfillment of the line items
+        
+        const email = customerDetails.email
+        const order = checkoutSession.metadata.order_id
+        const shippingAddress = customerDetails.address
+        const products = checkoutSession.line_items.data.map((item) => (
+            {
+                productId: item.id,
+                description: item.description,
+                priceId: item.price.id,
+                quantity: item.quantity
+            }
+        ))
+        // TODO: Record/save fulfillment status for this
+        // Checkout Session
+        await Order.findOneAndUpdate(
+            {session: sessionId}, 
+            {
+                email, 
+                order, 
+                products,
+                shippingAddress,
+                billingAddress: shippingAddress,
+                fulfilled: true,
+                fulfilledAt: Date.now(),
+                status: "To ship",
+                tracking: null
+            },
+            {upsert: true}
+        )
+    }
+
+    // TODO: Register endpoint for stripe to deliver events to 
+}
+
+export {createSession, getSession, fulfillCheckout}
