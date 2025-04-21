@@ -6,8 +6,8 @@ import mongoose from "mongoose"
 
 //model for database
 const otpSchema = new mongoose.Schema({
-    otp: {type: String, required: true, unique: true},
     email: {type: String, required:true, unique: true},
+    otp: {type: String, required: true},
     createdAt: {type: Date, default: Date.now, expires: 300}
 })
 

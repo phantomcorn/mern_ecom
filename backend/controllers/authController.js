@@ -19,17 +19,15 @@ const create = asyncHandler(async (req, res) => {
     if (!email) return res.status(400).send({message: "No email provided"})
     if (!validateEmail(email)) return res.status(400).send({message: "The email you have provided is not in the correct format"})
     
-    // Check if user has any completed session => if not, no user found
-    /* TO BE IMPLEMENTED */
-    
+    // TODO: Check if user has any completed session => if not, no user found
     const otp = generateOTP()
     await sendEmail(email, otp)
 
-    await Otp.create({
-        otp,
-        email
-    })
-
+    await Otp.findOneAndUpdate(
+        {email},
+        {otp},
+        {upsert: true}
+    )
     //return result to frontend
     res.status(200).send({
         message: `OTP sent to ${email}`
@@ -43,7 +41,7 @@ const verify = asyncHandler(async (req, res) => {
     if (!otp) return res.status(400).json({message: "Missing parameter"})
 
     const query = await Otp.findOne({email, otp})
-    if (!query) return res.status(404).send({message: "Erorr verifying OTP (no account found)"})
+    if (!query) return res.status(401).send({message: "Session expired"})
     
     const verified = verifyOTP(otp)
     if (!verified) return res.status(403).send({message: "Incorrect code"})
