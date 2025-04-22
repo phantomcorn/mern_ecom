@@ -1,5 +1,5 @@
-import { useGetOrderQuery } from "../features/user/userApiSlice"
 import getPrice from "../features/product/priceConversion"
+import React from "react"
 export default function Order({order}) {
 
     // const {data, isLoading, isError} = useGetOrderQuery({id: order?.id}, {skip: !order})
@@ -14,13 +14,11 @@ export default function Order({order}) {
 
             <div>Items</div>
             {products.map((product) => (
-                <>
-                    <div key={product.id}>
-                        <div> {product.description} </div>
-                        <div> x{product.quantity} </div>
-                        <div> {getPrice(order.currency, product.unitPrice * product.quantity)}</div>
-                    </div>
-                </>
+                <React.Fragment key={product.productId}>
+                    <div> {product.description} </div>
+                    <div> x{product.quantity} </div>
+                    <div> {getPrice(order.currency, product.unitPrice * product.quantity)}</div>
+                </React.Fragment>
             ))}
             <div>Subtotal: {getPrice(order.currency, order.subTotal)}</div>
             <div>Shipping: {getPrice(order.currency, order.shippingCost)}</div>
