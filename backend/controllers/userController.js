@@ -1,28 +1,25 @@
 import asyncHandler from "express-async-handler"
 import stripe from '../db/stripe.js'
+import Order from "../models/orderModel.js"
 
 
-// @route GET /api/user/order/:checkoutId
-const getOrder = asyncHandler(async (req,res) => {
+// @route GET /api/user/order/:sessionId
+// const getOrder = asyncHandler(async (req,res) => {
     
-    const {checkoutId} = req.params
-    const session = await stripe.checkout.sessions.listLineItems(checkoutId)
+//     const {sessionId} = req.params
+//     const items = await stripe.checkout.sessions.listLineItems(sessionId)
 
-    if (!session) return res.status(404).json({message: "No order found", orders: []})
-    return res.status(200).json({order: session})
-})
+//     if (!items) return res.status(404).json({message: "No order found", orders: []})
+//     return res.status(200).json({order: items})
+// })
 
 // @route GET /api/user/order
 const getOrders = asyncHandler(async (req,res) => {
     /* An order is a checkout session that has been fullfilled */
     const {email} = req.body
-    const sessions = await stripe.checkout.sessions.list({
-        customer_details: {email: email},
-        status: "complete"
-    })
-
-    if (!sessions) return res.status(200).json({message: "No orders found", orders: []})
-    return res.status(200).json({email: email, orders: sessions})
+    const orders = await Order.find({email})
+    if (!orders) return res.status(200).json({message: "No orders found", orders: []})
+    return res.status(200).json({orders})
 })
 
 
