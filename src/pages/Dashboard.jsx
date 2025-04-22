@@ -1,10 +1,16 @@
 import { useGetOrdersQuery } from "../features/user/userApiSlice"
 import getPrice from "../features/product/priceConversion"
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import Order from "./Order"
 export default function Dashboard() {
 
-    const {data, isSuccess, isError, isLoading} = useGetOrdersQuery()
+    const {data, error, isSuccess, isError, isLoading} = useGetOrdersQuery(undefined, {
+        pollingInterval: 5 * 60 * 1000, //Retrieve information every 5 minutes
+        refetchOnFocus: true,
+        refetchOnMountOrArgChange: true
+    }
+)
     const [index, setIndex] = useState(-1)
     const [currOrder, setCurrOrder] = useState(null)
 
@@ -16,7 +22,13 @@ export default function Dashboard() {
     
 
     if (isLoading) return <div> Loading... </div>
-    if (isError) return <div> Error </div>
+    if (isError) {
+        if (error.status === 403) {
+            return <div> Your login session has expired. Please <Link to="/login">login</Link> again </div>
+        } else {
+            return <div> {error.message} </div>
+        }
+    }
 
     const email = data.orders[0].email
     const orders = data.orders
