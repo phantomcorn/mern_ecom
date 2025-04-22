@@ -23,4 +23,4 @@ const getOrders = asyncHandler(async (req,res) => {
 })
 
 
-export {getOrder, getOrders}
+export { getOrders}
