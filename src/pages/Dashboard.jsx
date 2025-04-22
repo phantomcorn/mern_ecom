@@ -18,7 +18,8 @@ export default function Dashboard() {
     if (isLoading) return <div> Loading... </div>
     if (isError) return <div> Error </div>
 
-    const {email, orders: {data: orders}} = data
+    const email = data.orders[0].email
+    const orders = data.orders
 
     return (
         <div>
@@ -27,17 +28,14 @@ export default function Dashboard() {
             {index === -1 && 
                 <div>
                     <h3>Your orders</h3>
-                    {orders.map((order, i) => {
-                        if (order.metadata?.order_id) {
-                            
-                            return(
-                                <div key={order.metadata.order_id} onClick={() => setIndex(i)}>
-                                    <div> {order.metadata.order_id}</div>
-                                    <div>{getPrice(order.currency,order["amount_total"])} </div>
-                                </div>
-                            )
-                        }
-                    })}
+                    {orders.map((order, i) => (
+                            <div key={order.order} onClick={() => setIndex(i)}>
+                                <div> {order.order}</div>
+                                <div>{getPrice(order.currency,order.total)} </div>
+                                <div> STATUS: {order.status} </div>
+                            </div>
+                        )
+                    )}
                 </div>
             }
 
