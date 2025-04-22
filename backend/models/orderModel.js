@@ -14,9 +14,12 @@ const orderSchema = new mongoose.Schema({
         description: {type:String, required: true},
         priceId: {type: String, required: true},
         unitPrice: {type: Number, required: true},
-        currency: {type: String, required: true},
         quantity:  {type: Number, required: true},
     }],
+    subTotal: {type: Number, required: true},
+    total: {type: Number, required: true},
+    currency: {type: String, required: true},
+    shippingCost: {type: Number, required: true},
     shippingAddress: {
         name: {type: String, required: true},
         line1: {type: String, required: true},

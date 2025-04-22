@@ -20,6 +20,11 @@ const createSession = asyncHandler(async (req,res) => {
         shipping_address_collection: {
             allowed_countries: ["GB"]
         },
+        shipping_options: [
+            {shipping_rate: "shr_1RGWq3Q6v7HEvM5BIQ9afq8q"},
+            {shipping_rate: "shr_1RGWhJQ6v7HEvM5B2o5KHr5S"},
+            {shipping_rate: "shr_1RGWhlQ6v7HEvM5BEL0owx8M"}
+        ],
         //[
             // {
             //     // Provide the exact Price ID (for example, price_1234) of the product you want to sell
@@ -72,21 +77,23 @@ const fulfillCheckout = async (sessionId, customerDetails) => {
     // to determine if fulfillment should be performed
     if (checkoutSession.payment_status !== 'unpaid') {
       // TODO: Perform fulfillment of the line items
-        
         const email = customerDetails.email
         const order = checkoutSession.metadata.order_id
-        const shippingAddress = customerDetails.address
-        shippingAddress.name = customerDetails.name // add new field
         const products = checkoutSession.line_items.data.map((item) => (
             {
                 productId: item.id,
                 description: item.description,
                 priceId: item.price.id,
                 unitPrice: item.price.unit_amount,
-                currency: item.currency,
                 quantity: item.quantity
             }
         ))
+        const subTotal = checkoutSession.amount_subtotal
+        const total = checkoutSession.amount_total
+        const currency = checkoutSession.currency
+        const shippingCost = checkoutSession.shipping_cost.amount_total
+        const shippingAddress = customerDetails.address
+        shippingAddress.name = customerDetails.name // add new field
         // TODO: Record/save fulfillment status for this
         // Checkout Session
         await Order.findOneAndUpdate(
@@ -95,6 +102,10 @@ const fulfillCheckout = async (sessionId, customerDetails) => {
                 email, 
                 order, 
                 products,
+                subTotal,
+                total,
+                currency,
+                shippingCost,
                 shippingAddress,
                 billingAddress: shippingAddress,
                 fulfilled: true,
@@ -105,7 +116,7 @@ const fulfillCheckout = async (sessionId, customerDetails) => {
             {upsert: true}
         )
     }
-
+    console.log("Order fulfilled!")
     // TODO: Register endpoint for stripe to deliver events to 
 }
 
