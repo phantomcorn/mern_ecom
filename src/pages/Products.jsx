@@ -11,9 +11,8 @@ export default function Dashboard() {
         refetchOnMountOrArgChange: true
     })
     
-
-    if (isError) return <div> Error </div>
     if (isLoading) return <div> Loading... </div>
+    if (isError) return <div> Error </div>
 
     return (
         <div className="products">
