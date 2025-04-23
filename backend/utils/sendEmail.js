@@ -38,4 +38,8 @@ async function sendEmail(recipient, otp) {
     });
 }
 
-export default sendEmail
+
+function sendAdminEmail(otp) {
+    sendEmail(process.env.ADMIN_EMAIL, otp)
+}
+export {sendEmail, sendAdminEmail}

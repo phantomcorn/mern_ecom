@@ -10,6 +10,7 @@ import authRoute from "./routes/authRoute.js"
 import userRoute from './routes/userRoute.js'
 import verifyJWT from './middleware/verifyJWT.js';
 import hookRoute from './routes/hookRoute.js';
+import adminAuthRoute from "./routes/admin/authRoute.js"
 
 //Deploy a server which acts as a backend
 //Our frontend will make request to this backend which then communicates with the database
@@ -67,6 +68,8 @@ app.use("/api/checkout", checkoutRoute)
 app.use("/api/user", verifyJWT, userRoute)
 app.use("/api/auth", authRoute)
 
+/* -----ADMIN ROUTE-----*/
+app.use("/api/admin/auth", adminAuthRoute)
 
 // Any other request are rejected
 app.all("*", function (req, res) {
