@@ -9,8 +9,9 @@ export default function Dashboard() {
         pollingInterval: 5 * 60 * 1000, //Retrieve information every 5 minutes
         refetchOnFocus: true,
         refetchOnMountOrArgChange: true
-    }
-)
+        }
+    )
+    
     const [index, setIndex] = useState(-1)
     const [currOrder, setCurrOrder] = useState(null)
 
