@@ -6,7 +6,6 @@
 */
 
 import asyncHandler from 'express-async-handler'
-import validateEmail from '../../utils/validateEmail.js'
 import {sendAdminEmail} from '../../utils/sendEmail.js'
 import { generateOTP, verifyOTP } from '../../utils/otp.js'
 import jwt from "jsonwebtoken"
@@ -50,13 +49,18 @@ const verify = asyncHandler(async (req, res) => {
     if (!verified) return res.status(401).send({message: "Incorrect code"})
 
     if (otp !== query.otp) return res.status(403).send({message: "Session does not exist or expired"})
+
+    await AdminAccount.findOneAndUpdate(
+        query,
+        { $set : { otp: null }}
+    )
     /* Successful => generate access token */
     const accessToken = jwt.sign(
         {
             "UserInfo": {
-                "user": user
-            }
-
+                "user": user,
+                "admin": true
+            },
         },  
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "5m" }
@@ -105,7 +109,8 @@ const refresh = (req, res) => {
             const accessToken = jwt.sign(
                 {
                     "UserInfo": {
-                        "user": decoded.user
+                        "user": decoded.user,
+                        "admin": true
                     }
         
                 },  
