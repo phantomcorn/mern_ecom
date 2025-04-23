@@ -14,11 +14,21 @@ const baseQuery = fetchBaseQuery(
   }
 )
 
+//baseQueryWithReauth is used when polling requests
 const baseQueryWithReauth = async (args, api, extraOptions) => {
 
+  const authPath = ["/api/user/order"]
+  // args can be a string ("/path") or an object ({ url, method, body... })
+  const endpoint = typeof args === "string" ? args : args?.url;
+  
   let result = await baseQuery(args, api, extraOptions)
+  if (!authPath.includes(endpoint)) { //not auth path => just return result
+    return result
+  }
 
   if (result?.error?.status === 403) { //Invalid(Expired) access token
+
+    // get new access token
     const refreshResult = await baseQuery("/api/auth/refresh", api, extraOptions)
     if (refreshResult?.data) {
 
@@ -31,7 +41,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     } else {
 
       if (refreshResult?.error?.status === 403) {
-        refreshResult.error.data.message = "Your login session has expired. Please login again"
+        refreshResult.error.data.message = "Your login session has expired."
       }
       return refreshResult
 
