@@ -13,7 +13,6 @@ export const authApiSlice = apiSlice.injectEndpoints({ //Any auth api is injecte
                 method: 'POST',
                 body: credentials
             }),
-            providesTags: ["Auth"],
             invalidatesTags: ["Auth"]
         }),
         verify: builder.mutation({
@@ -22,7 +21,6 @@ export const authApiSlice = apiSlice.injectEndpoints({ //Any auth api is injecte
                 method: "POST",
                 body: credentials
             }),
-            providesTags: ["Auth"],
             invalidatesTags: ["Auth"]
         }),
         refresh: builder.mutation({
