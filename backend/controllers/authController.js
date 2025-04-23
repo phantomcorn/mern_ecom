@@ -40,12 +40,13 @@ const verify = asyncHandler(async (req, res) => {
     const { email, otp } = req.body;
     if (!otp) return res.status(400).json({message: "Missing parameter"})
 
-    const query = await Otp.findOne({email, otp})
-    if (!query) return res.status(401).send({message: "Session expired"})
-    
+    const query = await Otp.findOne({email})
+    if (!query) return res.status(403).send({message: "Session does not exist or expired"})
+
     const verified = verifyOTP(otp)
-    if (!verified) return res.status(403).send({message: "Incorrect code"})
-    
+    if (!verified) return res.status(401).send({message: "Incorrect code"})
+
+    if (otp !== query.otp) return res.status(403).send({message: "Session does not exist or expired"})
     /* Successful => generate access token */
     const accessToken = jwt.sign(
         {
@@ -85,7 +86,7 @@ const verify = asyncHandler(async (req, res) => {
 const refresh = (req, res) => { 
 
     const cookies = req.cookies
-    if (!cookies?.jwt) return res.status(401).send({message: "Unauthorized (No cookies)"})
+    if (!cookies?.jwt) return res.status(403).send({message: "Your login session has expired."})
 
     //retrieve the refresh token that was stored in the cookie back from our intial login
     const refreshToken = cookies.jwt
