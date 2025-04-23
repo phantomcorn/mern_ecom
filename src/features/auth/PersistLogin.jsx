@@ -9,6 +9,10 @@ import { useSelector } from "react-redux";
     Redux does not hold our state on refresh 
     Instead, we use the jwt cookie stored in our browser to regenerate our access token which can be used to authorize our login
 */
+/* 
+    We hit this component first everytime we refresh our web browser.
+    P.S. We may arrive at an error here first.
+*/
 const PersistLogin = () => {
 
     const [persist] = usePersist()
@@ -31,7 +35,7 @@ const PersistLogin = () => {
                 console.log("Verifying refresh token")
                 try {
                     // const response = 
-                    await refresh() //call refresh authApiSlice
+                    await refresh().unwrap() //call refresh authApiSlice
 
                     // { token } = response.data
                     console.log("Access token granted")
@@ -68,7 +72,7 @@ const PersistLogin = () => {
             data: no 
         */
         content = (
-            <div> {error.data?.message} </div>
+            <div> {error.data?.message} Please <Link to="/login"> login </Link> again (PersistLogin)</div>  
         )
     } else if (isSuccess && trueSuccess) { 
         console.log("Persist success")
