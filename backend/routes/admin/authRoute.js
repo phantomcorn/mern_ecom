@@ -5,7 +5,7 @@
     Any request to <BASE_URL>/api/admin/auth/ is further directed to the correct backend logic here
 */
 import express from "express"
-import {login, verify, refresh} from "../../controllers/admin/authController.js"
+import {login, verify, refresh, logout} from "../../controllers/admin/authController.js"
 import loginLimiter from "../../middleware/loginLimiter.js"
 const router = express.Router();
 
@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/login", login)
 
 /*  
-    <BASE_URL>/api/auth/
+    <BASE_URL>/api/admin/auth/
 
     Authenticate user 
     Once user is logged in, issues:
@@ -27,15 +27,15 @@ router.post("/login", login)
 router.post("/verify", verify)
 
 /*
-    <BASE_URL>/api/auth/refresh
+    <BASE_URL>/api/admin/auth/refresh
     Generate a new access token when expired
 */
 router.get("/refresh", refresh) 
 
 /*  
-    <BASE_URL>/api/auth/logout
+    <BASE_URL>/api/admin/auth/logout
     Clear jwt cookie (refresh token), if exist
 */
-// router.post("/logout", logout) 
+router.post("/logout", logout) 
 
 export default router

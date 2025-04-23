@@ -34,7 +34,7 @@ export default function AdminLogin() {
         try {
             const resp = await verify({user: infoRef.user.current, otp: infoRef.otp.current}).unwrap()
             dispatch(setCredentials({token : resp.token}))
-            navigate("/dashboard")
+            navigate("/admin/dashboard")
         } catch (err) {
             if (err.status === 401) setErrMsg("Incorrect code")
             else if (err.status === 403) setErrMsg("Session expired, please refresh this page and try again.")
