@@ -6,8 +6,8 @@ import mongoose from "mongoose"
 
 //model for database
 const productSchema = new mongoose.Schema({
-    productId : {type: String , required: true},
-    priceId: {type: String, required: true},
+    productId : {type: String , required: true, unique: true},
+    priceId: {type: String, required: true, unique: true},
     name : {type: String, required: true},
     quantity: {type: Number, required: true},
 })
