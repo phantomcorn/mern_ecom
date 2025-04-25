@@ -15,7 +15,6 @@ const add = asyncHandler(async (req, res) => {
     console.log("adding product")
 
     const {name, quantity, price, description, tax_code} = req.body
-    console.log(req.body)
     const productObj = await stripe.products.create({
         name,
         description,
@@ -42,9 +41,20 @@ const add = asyncHandler(async (req, res) => {
 
 // @route POST /api/admin/product/delete
 const remove = asyncHandler(async (req, res) => {
-    console.log("Remove")
+    const {id} = req.body
+    const prod = await Product.findOneAndDelete({productId: id})
+    if (!prod) return res.status(401).json({message: "Error removing product"})
+        
+    await stripe.prices.update(
+        prod.priceId,
+        {active: false}
+    )
+    await stripe.products.update(
+        prod.productId,
+        {active: false}
+    )
 
-    return res.status(200).json({})
+    return res.status(200).json({message: "Product deleted"})
 })
 
 
