@@ -62,14 +62,14 @@ const verify = asyncHandler(async (req, res) => {
                 "admin": true
             },
         },  
-        process.env.ACCESS_TOKEN_SECRET,
+        process.env.ADMIN_ACCESS_TOKEN_SECRET,
         { expiresIn: "5m" }
     )
 
     //create(encode) refresh token
     const refreshToken = jwt.sign(
         {"user": user},
-        process.env.REFRESH_TOKEN_SECRET,
+        process.env.ADMIN_REFRESH_TOKEN_SECRET,
         { expiresIn: "6h" } //expiry used to check against jwt.verify()
     )
 
@@ -101,7 +101,7 @@ const refresh = (req, res) => {
         and we generate a new access token
     */
     jwt.verify(refreshToken,
-        process.env.REFRESH_TOKEN_SECRET,
+        process.env.ADMIN_REFRESH_TOKEN_SECRET,
         asyncHandler(async (err, decoded) => {
             if (err) return res.status(403).send({message: "Forbidden (Invalid refresh token)"})
             
@@ -114,7 +114,7 @@ const refresh = (req, res) => {
                     }
         
                 },  
-                process.env.ACCESS_TOKEN_SECRET,
+                process.env.ADMIN_ACCESS_TOKEN_SECRET,
                 { expiresIn: "5m" }
             )
 
