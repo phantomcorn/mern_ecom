@@ -18,7 +18,7 @@ const adminVerifyJWT = (req, res, next) => {
             if (err) return res.status(403).json({message : "Forbidden"})
             //matches payload structure when we first generated the token
             if (!decoded.UserInfo.admin) return res.status(403).json({message : "Forbidden"})
-            req.body = {email : decoded.UserInfo.email}
+            req.body.email = decoded.UserInfo.email
             // console.log("Verify JWT success")
             next()
         }
