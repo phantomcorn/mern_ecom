@@ -120,12 +120,12 @@ const refresh = (req, res) => {
 
 // // @route POST /api/auth/logout
 // // If exist, clear browser's jwt cookie
-// const logout = (req,res) => {
-//     const cookies = req.cookies
-//     if (!cookies?.jwt) return res.status(204).json({message: "No content"})
-//     res.clearCookie('jwt', {httpOnly: true, sameSite: "none", secure: true})
-//     res.status(200).json({ message: "Cookies cleared"})
-// }
+const logout = (req,res) => {
+    const cookies = req.cookies
+    if (!cookies?.jwt) return res.status(204).json({message: "No content"})
+    res.clearCookie('jwt', {httpOnly: true, sameSite: "none", secure: true})
+    res.status(200).json({ message: "Cookies cleared"})
+}
 
 
-export {create, verify, refresh}
+export {create, verify, refresh, logout}

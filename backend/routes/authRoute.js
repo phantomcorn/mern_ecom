@@ -5,7 +5,7 @@
     Any request to <BASE_URL>/api/auth/ is further directed to the correct backend logic here
 */
 import express from "express"
-import {create, verify, refresh} from "../controllers/authController.js"
+import {create, verify, refresh, logout} from "../controllers/authController.js"
 import loginLimiter from "../middleware/loginLimiter.js"
 const router = express.Router();
 
@@ -36,6 +36,6 @@ router.get("/refresh", refresh)
     <BASE_URL>/api/auth/logout
     Clear jwt cookie (refresh token), if exist
 */
-// router.post("/logout", logout) 
+router.post("/logout", logout) 
 
 export default router
