@@ -14,6 +14,7 @@ import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import PersistLogin from './features/auth/PersistLogin.jsx';
 import AdminLogin from './pages/admin/AdminLogin.jsx';
+import PersistAdminLogin from './features/admin/auth/PersistAdminLogin.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 
@@ -31,6 +32,8 @@ function App() {
                   <Route path="/return/:sessionId" element={<Return/>} />
                   <Route element={<PersistLogin/>}>
                     <Route path="/dashboard" element={<Dashboard/>}/>
+                  </Route>
+                  <Route element={<PersistAdminLogin/>}>
                     <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
                   </Route>
                   <Route path="/" element={<Main />} />
