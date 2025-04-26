@@ -59,10 +59,19 @@ const remove = asyncHandler(async (req, res) => {
 
 
 //@route POST /api/admin/product/update
-const updateQuantity = (req, res) => { 
+const updateQuantity = asyncHandler(async (req, res) => { 
     console.log("update")
-    return res.status(200).json({})
-}
+    const {id, quantity} = req.body
+    
+    const update = await Product.findOneAndUpdate(
+        {productId: id},
+        {quantity}
+    )
+
+    if (!update) return res.status(401).json({message: `Could not find product with id ${id}`})
+
+    return res.status(200).json({message: "Update succesfully"})
+})
 
 
 export {add, remove, updateQuantity}
