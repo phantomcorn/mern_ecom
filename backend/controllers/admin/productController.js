@@ -10,6 +10,14 @@ import jwt from "jsonwebtoken"
 import Product from '../../models/productModel.js'
 import bcrypt from "bcrypt"
 import stripe from '../../db/stripe.js'
+
+const getProducts = asyncHandler(async (req,res) => {
+    const products = await Product.find({})
+    if (!products) return res.status(401).json({message: "Could not retrieve product"})
+
+    return res.status(200).json({products})
+})
+
 // @route POST /api/admin/product/add
 const add = asyncHandler(async (req, res) => {
     console.log("adding product")
@@ -74,4 +82,4 @@ const updateQuantity = asyncHandler(async (req, res) => {
 })
 
 
-export {add, remove, updateQuantity}
+export {add, remove, updateQuantity, getProducts}
