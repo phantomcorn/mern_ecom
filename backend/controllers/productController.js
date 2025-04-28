@@ -53,6 +53,25 @@ const getById = asyncHandler(async (req, res) => {
 })
 
 
+// called in precheckout (checkoutController.js)
+const deductProductQuantity = async (transactionSess, cart) => {
+    const itemOOS = [] //productId with too few quantity to reserve
+    for (const product of cart) {
+        const {productId, quantity} = product
+    
+        const updated = await Product.findOneAndUpdate( //deduct from inventory
+            {productId, quantity: {"$gte" : quantity}},
+            {"$inc" : {quantity: -quantity}},
+            {session: transactionSess}
+        )
+
+        if (!updated) itemOOS.push(productId)
+    }
+
+    return itemOOS
+}
 
 
-export { getAll, getById }
+
+
+export { getAll, getById, deductProductQuantity}

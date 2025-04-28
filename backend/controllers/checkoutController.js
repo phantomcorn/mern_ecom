@@ -2,7 +2,39 @@ import asyncHandler from "express-async-handler"
 import stripe from "../db/stripe.js";
 import getNextOrderNumber from "../utils/orderNumber.js";
 import Order from "../models/orderModel.js";
+import mongoose from "mongoose";
+import { createReservation } from "./reservationController.js";
+import { deductProductQuantity } from "./productController.js";
 const YOUR_DOMAIN = process.env.VITE_APP_BASE_URL;
+
+
+// Reserves product to prevent overselling
+const precheckout = async (sessionId, cart) => {
+
+    let transactionRes = true
+    
+    const transactionSession = await mongoose.startSession()
+    transactionSession.startTransaction()
+    try {
+        const itemOOS = await deductProductQuantity(transactionSession, cart)
+        if (itemOOS.length !== 0) throw new Error(`Not enough stock for product ${itemOOS}`);
+        console.log("Updated inventory complete")
+
+       const reserve = await createReservation(transactionSession, sessionId, cart)
+        if (!reserve) throw new Error("Failed to create reservation")
+        
+        console.log("Create reservation complete")
+        await transactionSession.commitTransaction()
+    } catch (err) {
+        await transactionSession.abortTransaction(); //Undo all transaction
+        transactionRes = false
+        console.error('Transaction aborted:', err.message);
+    } finally {
+        transactionSession.endSession();
+    }
+
+    return transactionRes
+}
 
 // @route POST /api/checkout/create-checkout-session
 const createSession = asyncHandler(async (req,res) => {
@@ -10,7 +42,6 @@ const createSession = asyncHandler(async (req,res) => {
     const cart = req.body
     const line_items = cart.map((product) => ({price : product.priceId, quantity: product.quantity}))
     const order_id = await getNextOrderNumber()
-
     const session = await stripe.checkout.sessions.create({
         ui_mode: "embedded",
         line_items: line_items,
@@ -25,6 +56,7 @@ const createSession = asyncHandler(async (req,res) => {
             {shipping_rate: "shr_1RGWhJQ6v7HEvM5B2o5KHr5S"},
             {shipping_rate: "shr_1RGWhlQ6v7HEvM5BEL0owx8M"}
         ],
+        expires_at: Math.floor(Date.now()/1000) + (30 * 60), //expires 30 minutes from creation
         //[
             // {
             //     // Provide the exact Price ID (for example, price_1234) of the product you want to sell
@@ -36,9 +68,9 @@ const createSession = asyncHandler(async (req,res) => {
         mode: 'payment',
     })
 
-    if (!session) {
-        return res.status(404).send({message: "Error creating new session"});
-    }
+    if (!session) return res.status(404).send({message: "Error creating new session"});
+    const reserve = await precheckout(session.id, cart)
+    if (!reserve) return res.status(401).send({message: "Something went wrong..."});
     return res.status(200).json({clientSecret: session.client_secret});
 })
 
