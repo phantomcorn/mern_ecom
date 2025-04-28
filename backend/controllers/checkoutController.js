@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler"
 import stripe from "../db/stripe.js";
 import getNextOrderNumber from "../utils/orderNumber.js";
 import Order from "../models/orderModel.js";
+import Reservation from "../models/reservationModel.js";
 import mongoose from "mongoose";
 import { createReservation } from "./reservationController.js";
 import { deductProductQuantity } from "./productController.js";
@@ -147,6 +148,9 @@ const fulfillCheckout = async (sessionId, customerDetails) => {
             },
             {upsert: true}
         )
+
+        //confirm order by removing from reservation
+        await Reservation.deleteOne({session: sessionId})
     }
     console.log("Order fulfilled!")
     // TODO: Register endpoint for stripe to deliver events to 
