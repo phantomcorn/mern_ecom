@@ -1,6 +1,8 @@
 import asyncHandler from 'express-async-handler'
 import Product from '../models/productModel.js'
 import stripe from '../db/stripe.js'
+import Reservation from '../models/reservationModel.js'
+import mongoose from "mongoose"
 
 // @route GET /api/product
 const getAll = asyncHandler(async (req, res) => {
@@ -71,7 +73,39 @@ const deductProductQuantity = async (transactionSess, cart) => {
     return itemOOS
 }
 
+const rollbackProductQuantity = async (checkoutSessionId) => {
+
+    let transactionRes = true
+    const transactionSession = await mongoose.startSession()
+    transactionSession.startTransaction()
+    try {
+        const reserved = await Reservation.findOne({session: checkoutSessionId})
+        if (!reserved) throw new Error ("Missing inventory reservation data. Please contact admin")
+
+        for (const product of reserved.products) {
+            const {productId, quantity} = product
+
+            const updated = await Product.findOneAndUpdate(
+                {productId},
+                { "$inc" : {quantity}},
+                {session : transactionSession}
+            )
+            if (!updated) throw new Error(`Error updating product ${productId}`)
+        }
+
+        await Reservation.deleteOne({ session: checkoutSessionId }, { session: transactionSession })
+
+        await transactionSession.commitTransaction()
+    } catch (err) {
+        await transactionSession.abortTransaction(); //Undo all transaction
+        console.error('Transaction aborted:', err.message);
+        transactionRes = false
+    } finally {
+        transactionSession.endSession();
+    }
+    console.log("Rollback complete")
+    return transactionRes
+}
 
 
-
-export { getAll, getById, deductProductQuantity}
+export { getAll, getById, deductProductQuantity, rollbackProductQuantity}
