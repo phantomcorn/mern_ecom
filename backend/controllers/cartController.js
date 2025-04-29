@@ -15,9 +15,9 @@ const getCart = asyncHandler(async (req,res) => {
 // @ POST /api/cart/add
 // Function called from product page
 const addToCart = asyncHandler(async (req,res) => {
-    const {id, quantity, priceId} = req.body
-    if (!id || !priceId || !quantity) return res.status(400).json({message: "Missing parameters"})
-    const item = {productId: id, priceId, quantity}
+    const {name, id, quantity, priceId, unitAmt, currency} = req.body
+    if (!name || !id || !priceId || !quantity || !unitAmt || !currency) return res.status(400).json({message: "Missing parameters"})
+    const item = {name, productId: id, priceId, quantity, unitAmt, currency}
 
     let session = req.cookies.SESSION
     let cart

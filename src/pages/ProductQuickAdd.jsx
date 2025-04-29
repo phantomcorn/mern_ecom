@@ -12,17 +12,24 @@ export default function ProductQuickAdd({product,i}) {
     const dispatch = useDispatch()
     const [isHover, setIsHover] = useState(false)
     const [quantity, setQuantity] = useState(1)
-    console.log(product)
 
-    const handleOnClick = (e) => {
+    async function handleOnClick(e) {
         e.preventDefault()
-        // try {
-        //     const resp = addToCart({product.id, product.priceId, quantity}).unwrap()
-        //     const products = resp.products
-        //     dispatch(setCart({products}))
-        // } catch (err) {
-        //     console.log(err)
-        // } 
+
+        const data = {
+            name: product.name,
+            id: product.id,
+            priceId: product.prices[0].id,
+            quantity,
+            unitAmt: product.prices[0].unitPrice,
+            currency: product.prices[0].currency
+        }
+
+        try {
+            await addToCart(data).unwrap()
+        } catch (err) {
+            console.log(err)
+        } 
     }
 
     return (

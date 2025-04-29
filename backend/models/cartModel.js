@@ -8,9 +8,12 @@ import mongoose from "mongoose"
 const cartSchema = new mongoose.Schema({
     session: {type: String, required: true, unique: true},
     products : [{
+        name: {type: String, required: true},
         productId: {type: String, required: true},
         priceId: {type: String, required: true},
         quantity:  {type: Number, required: true},
+        unitAmt: {type: Number, required: true},
+        currency: {type: String, required: true}
     }],
     createdAt: {type: Date, expires: 3 * 24 * 60 * 60 * 1000, default: Date.now}
 })

@@ -1,13 +1,9 @@
 import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import { useGetProductQuery } from "../features/product/productApiSlice";
-import { setCart } from "../features/cart/cartSlice";
 
 export default function Product() {
-
-  const dispatch = useDispatch()
   const {id} = useParams(); // Extracts "67af5949ffde5f37c751f47d"
   const [quantity, setQuantity] = useState(1)
   const [addToCart, cartMutation] = useAddToCartMutation()
@@ -23,15 +19,22 @@ export default function Product() {
 
   const product = data
   const priceObj = product.prices[0]
-  const priceId = priceObj.id
   const price = priceObj.copy
 
-  const handleClick = (e) => {
+  async function handleClick(e) {
     e.preventDefault()
+
+    const data = {
+      name: product.name,
+      id: product.id,
+      priceId: product.prices[0].id,
+      quantity,
+      unitAmt: product.prices[0].unit_amount,
+      currency: product.prices[0].currency
+    }
+    
     try {
-      const resp = addToCart({id, priceId, quantity}).unwrap()
-      const products = resp.products
-      dispatch(setCart({products}))
+      await addToCart(data).unwrap()
     } catch (err) {
       console.log(err)
     } 
