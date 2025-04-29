@@ -13,6 +13,7 @@ const getCart = asyncHandler(async (req,res) => {
         name: product.name,
         productId: product.productId,
         quantity: product.quantity,
+        priceId: product.priceId,
         priceCopy: getPrice(product.currency, product.unitAmt),
         totalCopy: getPrice(product.currency, product.unitAmt * product.quantity)
     }))
