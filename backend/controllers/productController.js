@@ -25,8 +25,8 @@ const getAll = asyncHandler(async (req, res) => {
             {
                 id: productPrice.id,
                 copy: getPrice(productPrice.currency, productPrice.unit_amount),
-                prices: productPrice.unit_amount,
-                currencies: productPrice.currency
+                unitPrice: productPrice.unit_amount,
+                currency: productPrice.currency
             }
         ))
 
