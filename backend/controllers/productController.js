@@ -21,15 +21,18 @@ const getAll = asyncHandler(async (req, res) => {
     const productPriceMap = productsResp.data.map(product => { 
         const productPrices = pricesResp.data.filter(price => price.product.id === product.id);
 
+        const prices = productPrices.map((productPrice) => (
+            {
+                id: productPrice.id,
+                copy: getPrice(productPrice.currency, productPrice.unit_amount),
+                prices: productPrice.unit_amount,
+                currencies: productPrice.currency
+            }
+        ))
+
         return {
             ...product,
-            prices: {
-                id: productPrices.id,
-                copy: productPrices.map((productPrice) => getPrice(productPrice.currency, productPrice.unit_amount)) ,
-                prices: productPrices.map((productPrice) => productPrice.unit_amount),
-                currencies: productPrices.map((productPrice) => productPrice.currency)
-            },
-           
+            prices
         };
     });
 

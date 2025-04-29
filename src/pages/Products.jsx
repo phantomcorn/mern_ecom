@@ -21,7 +21,7 @@ export default function Dashboard() {
 
                     <Link key={product.id} to={`/product/${product.id}`}>
                         <div>{product.name}</div>
-                        <div>{product.prices.copy[0]}</div>
+                        <div>{product.prices[0].copy}</div>
                     </Link>
                 ))            
             }
