@@ -22,11 +22,11 @@ export default function Cart() {
     }
 
     return (
-        <div className="items"> 
+        <div className="border-l-3 border-dashed border-black col-start-4 row-start-2 row-span-full"> 
             <div>Cart:</div>
             {cart && 
                 cart.map((item, idx) => 
-                    <div className="item" key={item._id}>
+                    <div  key={item._id}>
                         <div> Item {idx + 1} </div>
                         <div>{item.productId}</div>
                         <div>
