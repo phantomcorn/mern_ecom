@@ -1,17 +1,32 @@
 import { useGetOrdersQuery } from "../features/user/userApiSlice"
+import { useSendLogoutMutation } from "../features/auth/authApiSlice"
 import getPrice from "../features/product/priceConversion"
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Order from "./Order"
+
 export default function Dashboard() {
 
+    const navigate = useNavigate()
+    const [sendLogout, _] = useSendLogoutMutation()
     const {data, error, isSuccess, isError, isLoading} = useGetOrdersQuery(undefined, {
         pollingInterval: 5 * 60 * 1000, //Retrieve information every 5 minutes
         refetchOnFocus: true,
         refetchOnMountOrArgChange: true
         }
     )
+
     
+    async function handleSendLogout(e) {
+        e.preventDefault()
+        try {
+            await sendLogout().unwrap()
+            navigate("/login")
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     const [index, setIndex] = useState(-1)
     const [currOrder, setCurrOrder] = useState(null)
 
@@ -58,6 +73,8 @@ export default function Dashboard() {
                     <Order order={currOrder}/>
                 </>
             }
+
+            <button onClick={handleSendLogout}> Logout </button>
         </div>
     )
 }

@@ -1,19 +1,19 @@
 /*  
     PREV: frontend requests
-    NEXT: controllers/authController.js
+    NEXT: controllers/admin/authController.js
 
-    Any request to <BASE_URL>/api/auth/ is further directed to the correct backend logic here
+    Any request to <BASE_URL>/api/admin/auth/ is further directed to the correct backend logic here
 */
 import express from "express"
-import {create, verify, refresh, logout} from "../controllers/authController.js"
-import loginLimiter from "../middleware/loginLimiter.js"
+import {login, verify, refresh, logout} from "../../controllers/admin/authController.js"
+import loginLimiter from "../../middleware/loginLimiter.js"
 const router = express.Router();
 
-//<BASE_URL>/api/auth/create
-router.post("/create", create)
+//<BASE_URL>/api/admin/auth/login
+router.post("/login", login)
 
 /*  
-    <BASE_URL>/api/auth/
+    <BASE_URL>/api/admin/auth/
 
     Authenticate user 
     Once user is logged in, issues:
@@ -27,13 +27,13 @@ router.post("/create", create)
 router.post("/verify", verify)
 
 /*
-    <BASE_URL>/api/auth/refresh
+    <BASE_URL>/api/admin/auth/refresh
     Generate a new access token when expired
 */
 router.get("/refresh", refresh) 
 
 /*  
-    <BASE_URL>/api/auth/logout
+    <BASE_URL>/api/admin/auth/logout
     Clear jwt cookie (refresh token), if exist
 */
 router.post("/logout", logout) 

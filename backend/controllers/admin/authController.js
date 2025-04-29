@@ -1,68 +1,75 @@
 /*
-    PREV: /routes/authRoute.js
+    PREV: /routes/admin/AuthRoute.js
     NEXT: return result to frontend as JSON object
 
     This is where the backend logic happens
 */
 
 import asyncHandler from 'express-async-handler'
-import validateEmail from '../utils/validateEmail.js'
-import {sendEmail} from '../utils/sendEmail.js'
-
+import {sendAdminEmail} from '../../utils/sendEmail.js'
+import { generateOTP, verifyOTP } from '../../utils/otp.js'
 import jwt from "jsonwebtoken"
-import { generateOTP, verifyOTP } from '../utils/otp.js'
-import Otp from '../models/otpModel.js'
-
-// @route POST /api/auth/create
-const create = asyncHandler(async (req, res) => {
-    const {email} = req.body
-    if (!email) return res.status(400).send({message: "No email provided"})
-    if (!validateEmail(email)) return res.status(400).send({message: "The email you have provided is not in the correct format"})
+import AdminAccount from '../../models/adminAccountModel.js'
+import bcrypt from "bcrypt"
+// @route POST /api/admin/auth/login
+const login = asyncHandler(async (req, res) => {
+    const {user, pass} = req.body
+    if (!user || !pass) return res.status(400).send({message: "Parameter missing"})
     
-    // TODO: Check if user has any completed session => if not, no user found
-    const otp = generateOTP()
-    await sendEmail(email, otp)
+    const acc = await AdminAccount.findOne({user})
+    if (!acc) return res.status(400).send({message: "No account found"})
+    
+    const match = await bcrypt.compare(pass, acc.pass)
+    if (!match) return res.status(400).send({message: "Incorrect password"})
 
-    await Otp.findOneAndUpdate(
-        {email},
-        {otp},
-        {upsert: true}
+    const otp = generateOTP()
+    sendAdminEmail(otp)
+
+    await AdminAccount.findOneAndUpdate(
+        acc,
+        { $set: { otp } },
     )
+
     //return result to frontend
     res.status(200).send({
-        message: `OTP sent to ${email}`
+        message: `OTP sent to admin email`
     })
     
 })
 
-// @route POST /api/auth/verify
+// @route POST /api/admin/auth/verify
 const verify = asyncHandler(async (req, res) => {
-    const { email, otp } = req.body;
+    const { user, otp } = req.body;
     if (!otp) return res.status(400).json({message: "Missing parameter"})
 
-    const query = await Otp.findOne({email})
+    const query = await AdminAccount.findOne({user})
     if (!query) return res.status(403).send({message: "Session does not exist or expired"})
 
     const verified = verifyOTP(otp)
     if (!verified) return res.status(401).send({message: "Incorrect code"})
 
     if (otp !== query.otp) return res.status(403).send({message: "Session does not exist or expired"})
+
+    await AdminAccount.findOneAndUpdate(
+        query,
+        { $set : { otp: null }}
+    )
     /* Successful => generate access token */
     const accessToken = jwt.sign(
         {
             "UserInfo": {
-                "email": email
-            }
-
+                "user": user,
+                "admin": true
+            },
         },  
-        process.env.ACCESS_TOKEN_SECRET,
+        process.env.ADMIN_ACCESS_TOKEN_SECRET,
         { expiresIn: "5m" }
     )
 
     //create(encode) refresh token
     const refreshToken = jwt.sign(
-        {"email": email},
-        process.env.REFRESH_TOKEN_SECRET,
+        {"user": user},
+        process.env.ADMIN_REFRESH_TOKEN_SECRET,
         { expiresIn: "6h" } //expiry used to check against jwt.verify()
     )
 
@@ -75,14 +82,11 @@ const verify = asyncHandler(async (req, res) => {
         maxAge: 6 * 60 * 60 * 1000//set to match refreshToken expiry (6h in ms)
     })
 
-    // delete otp entry once used
-    await query.deleteOne()
-
     res.status(200).send({message: "Verified", token: accessToken})
 })
 
 
-//@route GET /api/auth/refresh
+//@route GET /api/admin/auth/refresh
 const refresh = (req, res) => { 
 
     const cookies = req.cookies
@@ -97,7 +101,7 @@ const refresh = (req, res) => {
         and we generate a new access token
     */
     jwt.verify(refreshToken,
-        process.env.REFRESH_TOKEN_SECRET,
+        process.env.ADMIN_REFRESH_TOKEN_SECRET,
         asyncHandler(async (err, decoded) => {
             if (err) return res.status(403).send({message: "Forbidden (Invalid refresh token)"})
             
@@ -105,11 +109,12 @@ const refresh = (req, res) => {
             const accessToken = jwt.sign(
                 {
                     "UserInfo": {
-                        "email": decoded.email
+                        "user": decoded.user,
+                        "admin": true
                     }
         
                 },  
-                process.env.ACCESS_TOKEN_SECRET,
+                process.env.ADMIN_ACCESS_TOKEN_SECRET,
                 { expiresIn: "5m" }
             )
 
@@ -118,8 +123,8 @@ const refresh = (req, res) => {
     )
 }
 
-// // @route POST /api/auth/logout
-// // If exist, clear browser's jwt cookie
+// @route POST /api/admin/auth/logout
+// If exist, clear browser's jwt cookie
 const logout = (req,res) => {
     const cookies = req.cookies
     if (!cookies?.jwt) return res.status(204).json({message: "No content"})
@@ -128,4 +133,4 @@ const logout = (req,res) => {
 }
 
 
-export {create, verify, refresh, logout}
+export {login, verify, refresh, logout}

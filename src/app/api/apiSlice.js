@@ -14,22 +14,28 @@ const baseQuery = fetchBaseQuery(
   }
 )
 
+function getRefreshEndpoint(endpoint) {
+  if (endpoint.startsWith("/api/admin")) return "/api/admin/auth/refresh"
+  return "/api/auth/refresh"
+}
+
 //baseQueryWithReauth is used when polling requests
 const baseQueryWithReauth = async (args, api, extraOptions) => {
 
+  const adminAuthPath = ["/api/admin/product","/api/admin/product/add","/api/admin/product/delete","/api/admin/product/update"]
   const authPath = ["/api/user/order"]
   // args can be a string ("/path") or an object ({ url, method, body... })
   const endpoint = typeof args === "string" ? args : args?.url;
-  
+
   let result = await baseQuery(args, api, extraOptions)
-  if (!authPath.includes(endpoint)) { //not auth path => just return result
+  if (!authPath.includes(endpoint) && !adminAuthPath.includes(endpoint)) { //not auth path => just return result
     return result
   }
-
+  
   if (result?.error?.status === 403) { //Invalid(Expired) access token
 
     // get new access token
-    const refreshResult = await baseQuery("/api/auth/refresh", api, extraOptions)
+    const refreshResult = await baseQuery(getRefreshEndpoint(endpoint), api, extraOptions)
     if (refreshResult?.data) {
 
       // store new access token
