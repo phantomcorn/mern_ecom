@@ -1,7 +1,6 @@
 import {motion} from "framer-motion"
 import { Link } from "react-router-dom"
 import { useState } from "react"
-import getPrice from "../features/product/priceConversion"
 const MotionLink = motion(Link)
 import { useAddToCartMutation } from "../features/cart/cartApiSlice"
 import { useDispatch } from "react-redux"
@@ -35,7 +34,7 @@ export default function ProductQuickAdd({product,i}) {
 
             <motion.div className="flex flex-col absolute left-0 w-full h-full text-white no-underline text-center py-[50px]" initial={{opacity: 0}} animate={{opacity: isHover ? 1 : 0}} >
                 <div> {product.description} </div>
-                <div>{getPrice(product.currencies[0], product.prices[0])} </div>
+                <div>{product.prices.copy[0]} </div>
                 <div className="flex justify-around">
                     <button className="cursor-pointer text-3xl" onClick={() => setQuantity((prev) => Math.max(1,prev - 1))}>-</button>
                     <div className="text-3xl">{quantity}</div>

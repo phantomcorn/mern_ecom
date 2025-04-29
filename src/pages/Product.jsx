@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useAddToCartMutation } from "../features/cart/cartApiSlice";
 import { useGetProductQuery } from "../features/product/productApiSlice";
 import { setCart } from "../features/cart/cartSlice";
-import getPrice from "../features/product/priceConversion";
 
 export default function Product() {
 
@@ -25,7 +24,7 @@ export default function Product() {
   const product = data
   const priceObj = product.prices[0]
   const priceId = priceObj.id
-  const price = getPrice(priceObj.currency,priceObj.unit_amount)
+  const price = priceObj.copy
 
   const handleClick = (e) => {
     e.preventDefault()

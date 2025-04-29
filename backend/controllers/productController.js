@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import Product from '../models/productModel.js'
 import stripe from '../db/stripe.js'
+import getPrice from '../utils/priceConversion.js'
 
 // @route GET /api/product
 const getAll = asyncHandler(async (req, res) => {
@@ -12,16 +13,23 @@ const getAll = asyncHandler(async (req, res) => {
         expand: ['data.product'], // optional: expands product info inside price
     });
     
+
     /* Match product ID to its price ID
         Price are in unit amount (aka £1 = 100) 
             => check by currency and convert to standard price
     */
     const productPriceMap = productsResp.data.map(product => { 
         const productPrices = pricesResp.data.filter(price => price.product.id === product.id);
+
         return {
             ...product,
-            prices: productPrices.map((productPrice) => productPrice.unit_amount),
-            currencies: productPrices.map((productPrice) => productPrice.currency)
+            prices: {
+                id: productPrices.id,
+                copy: productPrices.map((productPrice) => getPrice(productPrice.currency, productPrice.unit_amount)) ,
+                prices: productPrices.map((productPrice) => productPrice.unit_amount),
+                currencies: productPrices.map((productPrice) => productPrice.currency)
+            },
+           
         };
     });
 
@@ -48,7 +56,10 @@ const getById = asyncHandler(async (req, res) => {
 
     return res.status(200).json({
         ...product,
-        prices: prices.data
+        prices: prices.data.map((price) => ({
+            ...price,
+            copy: getPrice(price.currency, price.unit_amount)
+        }))
     })
 })
 

@@ -1,4 +1,3 @@
-import getPrice from "../features/product/priceConversion"
 import React from "react"
 export default function Order({order}) {
 
@@ -16,13 +15,13 @@ export default function Order({order}) {
             {products.map((product) => (
                 <React.Fragment key={product.productId}>
                     <div> {product.description} </div>
-                    <div> x{product.quantity} </div>
-                    <div> {getPrice(order.currency, product.unitPrice * product.quantity)}</div>
+                    <div> {product.priceCopy}x{product.quantity} </div>
+                    <div> {product.totalPriceCopy}</div>
                 </React.Fragment>
             ))}
-            <div>Subtotal: {getPrice(order.currency, order.subTotal)}</div>
-            <div>Shipping: {getPrice(order.currency, order.shippingCost)}</div>
-            <div>Total: {getPrice(order.currency, order.total)}</div>
+            <div>Subtotal: {order.subtotal_copy}</div>
+            <div>Shipping: {order.shipping_copy}</div>
+            <div>Total: {order.total_copy}</div>
 
             <div>Shipment to:</div>
             <div> {order.shippingAddress.name}</div>

@@ -1,5 +1,4 @@
 import { useGetOrdersQuery } from "../features/user/userApiSlice"
-import getPrice from "../features/product/priceConversion"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import Order from "./Order"
@@ -30,7 +29,7 @@ export default function Dashboard() {
             return <div> {error.message} </div>
         }
     }
-
+    
     const email = data.orders[0].email
     const orders = data.orders
 
@@ -44,7 +43,7 @@ export default function Dashboard() {
                     {orders.map((order, i) => (
                             <div key={order.order} onClick={() => setIndex(i)}>
                                 <div> {order.order}</div>
-                                <div>{getPrice(order.currency,order.total)} </div>
+                                <div>{order.total_copy} </div>
                                 <div> STATUS: {order.status} </div>
                             </div>
                         )
