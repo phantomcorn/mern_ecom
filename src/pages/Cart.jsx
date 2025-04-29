@@ -26,7 +26,7 @@ export default function Cart() {
             <div className="text-center text-3xl border-dashed border-black border-b-3">Cart:</div>
             {cart && 
                 cart.map((item, idx) => 
-                    <div key={item.productId} class="text-2xl border-dashed border-black border-b-3">
+                    <div key={item.productId} className="text-2xl border-dashed border-black border-b-3">
                         <div className="flex flex-row justify-between">
                             <div > {item.name} </div>
                             <div>{item.priceCopy}</div>
