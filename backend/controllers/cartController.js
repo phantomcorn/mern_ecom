@@ -1,15 +1,23 @@
 import asyncHandler from "express-async-handler"
 import Cart from "../models/cartModel.js"
 import crypto from "crypto"
-
+import getPrice from "./../utils/priceConversion.js"
 const getCart = asyncHandler(async (req,res) => {
     const session = req.cookies.SESSION
     if (!session) return res.status(200).json({products: [], message: "Session expired"})
 
     const cart = await Cart.findOne({session: session})
     if (!cart) return res.status(200).json({products: [], message: "No Cart"})
+   
+    const resp = cart.products.map((product) => ({
+        name: product.name,
+        productId: product.productId,
+        quantity: product.quantity,
+        priceCopy: getPrice(product.currency, product.unitAmt),
+        totalCopy: getPrice(product.currency, product.unitAmt * product.quantity)
+    }))
 
-    return res.status(200).json({products: cart.products})
+    return res.status(200).json({products: resp})
 })
 
 // @ POST /api/cart/add

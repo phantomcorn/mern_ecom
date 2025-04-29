@@ -22,23 +22,26 @@ export default function Cart() {
     }
 
     return (
-        <div className="border-l-3 border-dashed border-black col-start-4 row-start-2 row-span-full"> 
-            <div>Cart:</div>
+        <div className="relative border-l-3 border-dashed border-black col-start-4 row-start-2 row-span-full"> 
+            <div className="text-center text-3xl border-dashed border-black border-b-3">Cart:</div>
             {cart && 
                 cart.map((item, idx) => 
-                    <div  key={item._id}>
-                        <div> Item {idx + 1} </div>
-                        <div>{item.productId}</div>
-                        <div>
-                            <button onClick={(e) => modifyCart(e, decrFromCart, item.productId)}>-</button>
-                            {item.quantity}
-                            <button onClick={(e) => modifyCart(e, incrFromCart, item.productId)}>+</button>
+                    <div key={item.productId} class="text-2xl border-dashed border-black border-b-3">
+                        <div className="flex flex-row justify-between">
+                            <div > {item.name} </div>
+                            <div>{item.priceCopy}</div>
                         </div>
+                        <div className="flex justify-end">
+                            <button className="cursor-pointer" onClick={(e) => modifyCart(e, decrFromCart, item.productId)}>-</button>
+                            {item.quantity}
+                            <button className="cursor-pointer" onClick={(e) => modifyCart(e, incrFromCart, item.productId)}>+</button>
+                        </div>
+                        <div className="text-right">{item.totalCopy} </div>
                     </div>
                 )
             } 
 
-            {cart.length > 0 && <Link to="/checkout">Checkout</Link>}
+            {cart && cart.length > 0 && <Link to="/checkout" className="absolute bottom-10 right-0 block w-50 bg-black text-white">Checkout</Link>}
         </div> 
     )
 }
